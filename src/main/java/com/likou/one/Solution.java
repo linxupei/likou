@@ -7,62 +7,51 @@ import java.util.*;
 
 class Solution {
     /**
-     * 统计字符串s的字符频率
-     * 再统计字符串t的字符频率
-     * 若某个字符出现的频率不一致, 则返回即可
+     * 通过查找规律, 发现matrix[i][j]经过翻转会变到matrix[j][n-i-i]
+     * 通过这一规律使用原地翻转的方式
+     * 通过画图易知对于长度为偶数的矩阵我们只需要枚举(n/2)*(n/2)个位置
+     * 长度为奇数的矩阵我们需要枚举((n+1)/2)*((n+1)/2)个位置
      */
-    public static char findTheDifference1(String s, String t) {
-        char[] charS = s.toCharArray();
-        char[] charT = t.toCharArray();
-        int []frequent = new int[26];
-        for (int i = 0; i < charS.length; i++) {
-            frequent[charS[i]-'a']++;
-        }
-        for (int i = 0; i < charT.length; i++) {
-            frequent[charT[i]-'a']--;
-            if (frequent[charT[i]-'a'] < 0) {
-                return charT[i];
+    public static void rotate1(int[][] matrix) {
+        int n = matrix.length;
+        for (int i = 0; i < n / 2; i++) {
+            for (int j = 0; j < (n + 1) / 2; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[n-j-1][i];
+                matrix[n-j-1][i] = matrix[n-i-1][n-j-1];
+                matrix[n-i-1][n-j-1] = matrix[j][n-i-1];
+                matrix[j][n-i-1] = temp;
             }
         }
-        return ' ';
     }
 
     /**
-     * 通过(^异或)位运算可把出现次数为偶次的字符去掉
-     * A^A=0
+     * 旋转90度
+     * 可分解为如下过程
+     * 1.水平翻转
+     * 2.主对角线翻转
      */
-    public static char findTheDifference2(String s, String t) {
-        char[] charS = s.toCharArray();
-        char[] charT = t.toCharArray();
-        int result = 0;
-        for (char aChar : charS) {
-            result ^= aChar;
+    public static void rotate(int[][] matrix) {
+        int n = matrix.length;
+        //水平翻转
+        for (int i = 0; i < n / 2; i++) {
+            int[] temp = matrix[i];
+            matrix[i] = matrix[n-i-1];
+            matrix[n-i-1] = temp;
         }
-        for (char c : charT) {
-            result ^= c;
+        //对角线翻转
+        for (int i = 0; i < n-1; i++) {
+            for (int j = i+1; j < n; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
         }
-        return (char) result;
     }
 
-    /**
-     * 通过两个字符串ASCII码值总和相减
-     * 差值即为被添加的字符
-     */
-    public static char findTheDifference(String s, String t) {
-        char[] charS = s.toCharArray();
-        char[] charT = t.toCharArray();
-        int as = 0, at = 0;
-        for (char c : charS) {
-            as += c;
-        }
-        for (char c : charT) {
-            at += c;
-        }
-        return (char) (at - as);
-    }
 
     public static void main(String[] args) {
-        System.out.println(findTheDifference("abcd", "abcde"));
+
     }
 }
 
