@@ -7,20 +7,64 @@ import java.util.*;
 
 class Solution {
 
-    /**
-     * 由于到达第i层可从i-1层或i-2层开始
-     * 定义数组dp[n+1]
-     * dp[0],dp[1]表示第一第二层
-     */
-    public static int minCostClimbingStairs(int[] cost) {
-        int n = cost.length;
-        int[] dp = new int[n];
-        dp[0] = 0;
-        dp[1] = 0;
-        for (int i = 2; i < n+1; i++) {
-            dp[i] = Math.min(dp[i-1]+cost[i-1], dp[i-2]+cost[i-2]);
+    public static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int x) {
+            val = x;
         }
-        return dp[n];
+    }
+
+    /**
+     * 经过简要分析可知从每一层遍历输出的最后一个结点开始遍历
+     * 然后不断转换每一层遍历左右结点方向即可得到结果
+     */
+    public static List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> results = new LinkedList<>();
+        if (root == null) {
+            return results;
+        }
+        //next用于存放下一层的结点
+        List<TreeNode> next = new LinkedList<>();
+        //now用于存放当前遍历层的结点
+        List<TreeNode> now = new LinkedList<>();
+        now.add(root);
+        int flag = -1;
+        while (!now.isEmpty()) {
+            //保存当前层结点数, 在遍历过程中now的大小会发生变化
+            int size = now.size();
+            List<Integer> result = new LinkedList<>();
+            for (int i = size-1; i >= 0; i--) {
+                TreeNode node = now.remove(i);
+                result.add(node.val);
+                if (flag > 0) {
+                    if (node.right != null) {
+                        next.add(node.right);
+                    }
+                    if (node.left != null) {
+                        next.add(node.left);
+                    }
+                } else {
+                    if (node.left != null) {
+                        next.add(node.left);
+                    }
+                    if (node.right != null) {
+                        next.add(node.right);
+                    }
+                }
+            }
+            //将下一层赋值给now
+            List<TreeNode> temp = now;
+            now = next;
+            next = temp;
+            //将当前遍历层的数值加入结果集
+            results.add(result);
+            //修改标志, 转变下一次遍历方向
+            flag = -flag;
+        }
+        return results;
     }
 
 
