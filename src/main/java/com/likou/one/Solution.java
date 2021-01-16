@@ -8,7 +8,7 @@ class Solution {
      * 每一个连通分量代表这一部分的石子最后能移除至只剩一个石子
      * 因此返回的结果就是: 所有的石子的数量-连通分量的个数
      *
-     * 而通过并查集,
+     * 而通过并查集, 则可以快速找出石子之间关系, 找出连通分量个数
      */
     public int removeStones(int[][] stones) {
         UnionFind unionFind = new UnionFind();
