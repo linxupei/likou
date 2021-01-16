@@ -1,26 +1,29 @@
 package com.likou.one;
 
-
-import javafx.util.Pair;
-
 import java.util.*;
 
 class Solution {
-
+    /**
+     * 通过分析题意, 可知该题在求以石子构成的图所拥有的连通分量的个数
+     * 每一个连通分量代表这一部分的石子最后能移除至只剩一个石子
+     * 因此返回的结果就是: 所有的石子的数量-连通分量的个数
+     *
+     * 而通过并查集,
+     */
     public int removeStones(int[][] stones) {
         UnionFind unionFind = new UnionFind();
         for (int[] stone :
                 stones) {
             unionFind.union(~stone[0], stone[1]);
-            unionFind.union(stone[0]-10001, stone[1]);
-            unionFind.union(stone[0]+10001, stone[1]);
+            //unionFind.union(stone[0]-10001, stone[1]);
+            //unionFind.union(stone[0]+10001, stone[1]);
         }
         return stones.length - unionFind.getCount();
     }
 
     private class UnionFind {
         private Map<Integer, Integer> parent;
-
+        //连通分量个数
         private int count;
 
         public UnionFind() {
