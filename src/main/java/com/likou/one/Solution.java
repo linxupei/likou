@@ -6,88 +6,36 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Solution {
-    public static int[] maxSlidingWindow(int[] nums, int k) {
-        int n = nums.length;
-        int[] prefixMax = new int[n];
-        int[] suffixMax = new int[n];
-        for (int i = 0; i < n; ++i) {
-            if (i % k == 0) {
-                prefixMax[i] = nums[i];
-            }
-            else {
-                prefixMax[i] = Math.max(prefixMax[i - 1], nums[i]);
-            }
-        }
-        for (int i = n - 1; i >= 0; --i) {
-            if (i == n - 1 || (i + 1) % k == 0) {
-                suffixMax[i] = nums[i];
-            } else {
-                suffixMax[i] = Math.max(suffixMax[i + 1], nums[i]);
-            }
-        }
-
-        int[] ans = new int[n - k + 1];
-        for (int i = 0; i <= n - k; ++i) {
-            ans[i] = Math.max(suffixMax[i], prefixMax[i + k - 1]);
-        }
-        return ans;
-    }
-
     /**
-     * 单调递减队列
-     */
-    public static int[] maxSlidingWindow2(int[] nums, int k) {
-        int length = nums.length;
-        int[] maxNums = new int[length - k + 1];
-        Deque<Integer> deque = new LinkedList<>();
-        for (int i = 0; i < k; i++) {
-            while (!deque.isEmpty() && nums[i] >= nums[deque.peekLast()]) {
-                deque.pollLast();
-            }
-            deque.offer(i);
+     * 设爱丽丝糖果总量为sum1, 需交换x, 鲍勃糖果总量为sum2, 需交换y
+     * 则sum1-x+y=sum2-y+x;
+     * x = (sum1-sum2)/2 + y
+     * 找出一个x, y满足上式即可
+     **/
+    public static int[] fairCandySwap(int[] A, int[] B) {
+        int sum1 = 0, sum2 = 0;
+        HashSet<Integer> hashSet = new HashSet<>();
+        int[] result = new int[2];
+        for (int i = 0; i < A.length; i++) {
+            sum1 += A[i];
+            hashSet.add(A[i]);
         }
-        maxNums[0] = nums[deque.peekFirst()];
-        for (int i = k; i < length; i++) {
-            //若当前值比队列末尾值大, 移除队列末尾值
-            while (!deque.isEmpty() && nums[i] >= nums[deque.peekLast()]) {
-                deque.pollLast();
-            }
-            //将队列头中下标不符合滑动窗口范围的移除
-            while (!deque.isEmpty() && deque.peekFirst() <= i - k) {
-                deque.pollFirst();
-            }
-            deque.offer(i);
-            maxNums[i-k+1] = nums[deque.peekFirst()];
+        for (int i = 0; i < B.length; i++) {
+            sum2 += B[i];
         }
-        return maxNums;
-    }
-
-    /**
-     * 通过优先队列, 大根堆
-     * 将当前下标以及下标对应的值放入大根堆中
-     * 先比较值, 再比较下标
-     */
-    public static int[] maxSlidingWindow_(int[] nums, int k) {
-        int length = nums.length;
-        PriorityQueue<int[]> priorityQueue = new PriorityQueue<>((o1, o2) -> o1[0] != o2[0] ? o2[0]-o1[0] : o2[1]-o1[1]);
-        int[] maxNums = new int[length - k + 1];
-        for (int i = 0; i < k; i++) {
-            priorityQueue.offer(new int[]{nums[i], i});
-        }
-        maxNums[0] = priorityQueue.peek()[0];
-        for (int i = k; i < length; i++) {
-            priorityQueue.offer(new int[]{nums[i], i});
-            //当根节点的下标不在滑动窗口范围内的时候, 移除
-            while (priorityQueue.peek()[1] <= i - k) {
-                priorityQueue.poll();
+        for (int i = 0; i < B.length; i++) {
+            int a = (sum1-sum2)/2 + B[i];
+            if (hashSet.contains(a)) {
+                result[0] = a;
+                result[1] = B[i];
+                break;
             }
-            maxNums[i-k+1] = priorityQueue.peek()[0];
         }
-        return maxNums;
+        return result;
     }
 
     public static void main(String[] args) {
-        System.out.println(maxSlidingWindow(new int[]{1,3,1,2,0,5}, 3));
+        System.out.println(fairCandySwap(new int[]{1,1}, new int[]{2,2}));
     }
 }
 
