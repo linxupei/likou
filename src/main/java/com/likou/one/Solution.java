@@ -7,35 +7,39 @@ import java.util.stream.Collectors;
 
 class Solution {
     /**
-     * 创建一个数组(长度为2k, 这是两端顶点能到达的最大值)用于保存用于窗口滑动的数组
-     * 先将cardPoints的下标k-1->0放入数组, 再将下标length->length-k放入数组
-     * 最后进行窗口滑动即可, 需判断k==length?
+     * 分成3种情况讨论, 设下标l, r对应位置为1
+     * 1.(l, r)间全为0, 可供种植的位置有l-r-2, 最多种植(l-r-2)/2
+     * 2.l左边全为0, 可供种植的位置为l-1, 最多种植(l-1)/2
+     * 3.r右边全为0, 可供种植的位置为length-r-1, 最多种植(length-r-1)/2
      */
-    public static int maxScore(int[] cardPoints, int k) {
-        int[] points = new int[2 * k];
-        int length = cardPoints.length;
+    public static boolean canPlaceFlowers(int[] flowerbed, int n) {
+        int pre = -1;
+        int length = flowerbed.length;
         int total = 0;
-        int max = 0;
-        for (int i = k - 1; i >= 0; i--) {
-            points[k - 1 - i] = cardPoints[i];
-            total += cardPoints[i];
-        }
-        max = total;
-        for (int i = length - 1; i >= length - k; i--) {
-            points[length + k - 1 - i] = cardPoints[i];
-        }
-        if (k != length) {
-            for (int i = k; i < 2 * k; i++) {
-                total += points[i];
-                total -= points[i-k];
-                max = Math.max(max, total);
+        for (int i = 0; i < length; i++) {
+            if (flowerbed[i] == 1) {
+                if (pre < 0) {
+                    //第二种情况
+                    total += (i / 2);
+                } else {
+                    //第一种情况
+                    total += ((i - pre - 2) / 2);
+                }
+                pre = i;
             }
         }
-        return max;
+        if (pre < 0) {
+            //第一种情况
+            total += ((length + 1) / 2);
+        } else {
+            //第三种情况
+            total += ((length - pre - 1) / 2);
+        }
+        return total >= n;
     }
 
     public static void main(String[] args) {
-        System.out.println(maxScore(new int[]{1,2,3,4,5,6,1}, 3));
+        System.out.println(canPlaceFlowers(new int[]{1,0,0,0,1}, 1));
     }
 }
 
