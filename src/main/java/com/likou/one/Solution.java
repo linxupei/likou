@@ -6,36 +6,43 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Solution {
+
+    public static class ListNode {
+        int val;
+        ListNode next;
+        ListNode() {}
+        ListNode(int val) { this.val = val; }
+        ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+    }
+
     /**
-     * 创建一个数组(长度为2k, 这是两端顶点能到达的最大值)用于保存用于窗口滑动的数组
-     * 先将cardPoints的下标k-1->0放入数组, 再将下标length->length-k放入数组
-     * 最后进行窗口滑动即可, 需判断k==length?
+     * 将所有小于x的结点放入listNode1
+     * 其余放入listNode2
+     * 最后合并两个链表即可
+     * 此方法不会改变原链表
      */
-    public static int maxScore(int[] cardPoints, int k) {
-        int[] points = new int[2 * k];
-        int length = cardPoints.length;
-        int total = 0;
-        int max = 0;
-        for (int i = k - 1; i >= 0; i--) {
-            points[k - 1 - i] = cardPoints[i];
-            total += cardPoints[i];
-        }
-        max = total;
-        for (int i = length - 1; i >= length - k; i--) {
-            points[length + k - 1 - i] = cardPoints[i];
-        }
-        if (k != length) {
-            for (int i = k; i < 2 * k; i++) {
-                total += points[i];
-                total -= points[i-k];
-                max = Math.max(max, total);
+    public static ListNode partition(ListNode head, int x) {
+        ListNode head1 = new ListNode();
+        ListNode listNode1 = head1;
+        ListNode head2 = new ListNode();
+        ListNode listNode2 = head2;
+        ListNode temp = head;
+        while (temp != null) {
+            if (temp.val < x) {
+                listNode1.next = new ListNode(temp.val);
+                listNode1 = listNode1.next;
+            } else {
+                listNode2.next = new ListNode(temp.val);
+                listNode2 = listNode2.next;
             }
+            temp = temp.next;
         }
-        return max;
+        listNode1.next = head2.next;
+        return head1.next;
     }
 
     public static void main(String[] args) {
-        System.out.println(maxScore(new int[]{1,2,3,4,5,6,1}, 3));
+
     }
 }
 
