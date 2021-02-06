@@ -28,7 +28,7 @@ class Solution {
     }
 
     public static void main(String[] args) {
-        System.out.println(characterReplacement(new String("ABAB"), 2));
+        System.out.println(characterReplacement(new String("AABABBA"), 1));
     }
 }
 
