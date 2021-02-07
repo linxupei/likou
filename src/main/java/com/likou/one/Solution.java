@@ -18,7 +18,7 @@ class Solution {
         char current = chars[0];
         for (int i = 1; i < length; i++) {
             if (chars[i] != current) {
-                if (i - start > 1) {
+                if (i - start > 2) {
                     List<Integer> temp = new LinkedList<>();
                     temp.add(start);
                     temp.add(i - 1);
