@@ -7,78 +7,48 @@ import java.util.stream.Collectors;
 
 class Solution {
     /**
-     * 运用滑动窗口的原理
-     * [left,right]表示符合要求的窗口的范围
-     * flag表示上两个数字的比较
-     * flag = 1, 表示上两个数字的关系为大于
-     * flag = 0, 表示上两个数字的关系为等于
-     * flag = -1, 表示上两个数字的关系为小于
-     * 当满足湍流数组的要求时, right右移一位
-     * 不满足时, 比较(max, right-left+1), 并right右移一位, 然后将right赋值给left,
-     * 重新开始计算窗口长度
+     * 设区间[left, right]是满足条件的子区间
+     * 那么保持right不变, left变化
+     * 一定会存在一个i<=left<=j的区间使得[left, right]是满足条件
+     * 当left再小一点(种类>K)或再大一点(种类<K)都不满足条件,
      */
-    public static int maxTurbulenceSize_(int[] arr) {
-        int max = 0;
-        int flag = 0;
-        int left = 0, right = 0;
-        int length = arr.length;
-        if (length <= 1) {
-            return length;
-        }
-        while (right < length - 1) {
-            if (arr[right] > arr[right+1] && (flag < 0 || right == 0)) {
-                right++;
-                flag = 1;
-            } else if (arr[right] < arr[right+1] && (flag > 0 || right == 0)) {
-                right++;
-                flag = -1;
-            } else {
-                max = Math.max(max, right - left + 1);
-                while (right < length-1 && arr[right] == arr[right+1]) {
-                    right++;
-                }
-                if (right < length-1 && arr[right] > arr[right+1]) {
-                    flag = -1;
-                } else {
-                    flag = 1;
-                }
-                left = right;
+    public static int subarraysWithKDistinct(int[] A, int K) {
+        int length = A.length;
+        int total1 = 0, total2 = 0;
+        int result = 0;
+        int[] num1 = new int[length+1], num2 = new int[length+1];
+        int left1 = 0, left2 = 0, right = 0;
+        while (right < length) {
+            if (num1[A[right]] == 0) {
+                total1++;
             }
-
-        }
-        return Math.max(max, right - left + 1);
-    }
-
-    public static int maxTurbulenceSize(int[] arr) {
-        int max = 0;
-        boolean flag = true;
-        int left = 0, right = 0;
-        int length = arr.length;
-        if (length <= 1) {
-            return length;
-        }
-        while (right < length - 1) {
-            if (flag) {
-                right++;
-                flag = false;
-            } else if (arr[right-1] > arr[right] && arr[right] < arr[right+1]) {
-                right++;
-            } else if (arr[right-1] < arr[right] && arr[right] > arr[right+1]) {
-                right++;
-            } else {
-                max = Math.max(max, right-left+1);
-                while (right < length-1 && arr[right] == arr[right+1]) {
-                    right++;
-                }
-                flag = true;
-                left = right;
+            num1[A[right]]++;
+            if (num2[A[right]] == 0) {
+                total2++;
             }
+            num2[A[right]]++;
+            while (total1 > K) {
+                num1[A[left1]]--;
+                if (num1[A[left1]] == 0) {
+                    total1--;
+                }
+                left1++;
+            }
+            while (total2 > K-1) {
+                num2[A[left2]]--;
+                if (num2[A[left2]] == 0) {
+                    total2--;
+                }
+                left2++;
+            }
+            result += left2 - left1;
+            right++;
         }
-        return Math.max(max, right-left+1);
+        return result;
     }
 
     public static void main(String[] args) {
-        System.out.println(maxTurbulenceSize(new int[]{1,1}));
+        System.out.println(subarraysWithKDistinct(new int[]{1,2}, 1));
     }
 }
 
