@@ -7,25 +7,24 @@ import java.util.stream.Collectors;
 
 class Solution {
     /**
-     * 通过不断增长的滑动窗口原理, 每次遇到非1
-     * 即打破窗口, 统计窗口长度
+     * 仔细分析可知每次都让最小的两个组合在一起, 这样才能获得最大的总和
+     * 比如, 有四个数, x1<x2<x3<x4
+     * 若不让x1与x2组合, 那么必有一个较大值(x3或x4)与之组合
+     * 那么最后只能得到两个较小值的总和
      */
-    public static int findMaxConsecutiveOnes(int[] nums) {
-        int left = 0, right = 0;
-        int max = 0;
-        for (int num : nums) {
-            if (num != 1) {
-                max = Math.max(max, right - left);
-                left = right + 1;
-            }
-            right++;
+    public static int arrayPairSum(int[] nums) {
+        Arrays.sort(nums);
+        int result = 0;
+        int length = nums.length;
+        for (int i = 0; i < length; i+=2) {
+            result += nums[i];
         }
-        return Math.max(max, right - left);
+        return result;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(findMaxConsecutiveOnes(new int[]{1}));
+        System.out.println(arrayPairSum(new int[]{1,2,4,3}));
     }
 }
 
