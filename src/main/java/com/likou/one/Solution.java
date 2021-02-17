@@ -7,24 +7,29 @@ import java.util.stream.Collectors;
 
 class Solution {
     /**
-     * 仔细分析可知每次都让最小的两个组合在一起, 这样才能获得最大的总和
-     * 比如, 有四个数, x1<x2<x3<x4
-     * 若不让x1与x2组合, 那么必有一个较大值(x3或x4)与之组合
-     * 那么最后只能得到两个较小值的总和
+     * 行优先遍历原数组的每一个元素, 放入结果数组即可
      */
-    public static int arrayPairSum(int[] nums) {
-        Arrays.sort(nums);
-        int result = 0;
-        int length = nums.length;
-        for (int i = 0; i < length; i+=2) {
-            result += nums[i];
+    public static int[][] matrixReshape(int[][] nums, int r, int c) {
+        int row = nums.length;
+        int col = nums[0].length;
+        //判断原数组元素个数是否与结果数组相同
+        if (row*col != r*c) {
+            return nums;
+        }
+        int[][] result = new int[r][c];
+        int index = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                result[index/c][index%c] = nums[i][j];
+                index++;
+            }
         }
         return result;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(arrayPairSum(new int[]{1,2,4,3}));
+        System.out.println(matrixReshape(new int[][]{{1,2,4,3},{1,2,4,3}}, 4, 2));
     }
 }
 
