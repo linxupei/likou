@@ -11,7 +11,7 @@ class Solution {
      * 以right为子串右边界, left为子串左边界
      * 当子串出现0的次数大于K时, 统计子串的长度,
      * 并将left移动到使子串0的次数不大于K的位置
-     * right为主动移动, left为被动移动
+     * 注意: right为主动移动, left为被动移动
      */
     public static int longestOnes(int[] A, int K) {
         int max = 0;
