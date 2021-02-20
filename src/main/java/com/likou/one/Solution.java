@@ -7,44 +7,64 @@ import java.util.stream.Collectors;
 
 class Solution {
     /**
-     * 滑动窗口, K的大小即子串允许存在多少个0
-     * 以right为子串右边界, left为子串左边界
-     * 当子串出现0的次数大于K时, 统计子串的长度,
-     * 并将left移动到使子串0的次数不大于K的位置
-     * 注意: right为主动移动, left为被动移动
+     * 通过哈希表保存数组中数字最初出现的位置、最后出现的位置以及出现的频率
+     * 当遍历某个数字出现的频率最大时，该频率很可能就是数组的度，直接求初末位置之差即可
+     * 当出现两个数字的出现频率都一致时，选取两个数字的初末位置之差中较小的
      */
-    public static int longestOnes(int[] A, int K) {
-        int max = 0;
-        int left = 0, right = 0;
-        int flag = 0;
-        int length = A.length;
-        while (right < length) {
-            if (A[right] == 0) {
-                K--;
-                if (K == 0 && flag <= left) {
-                    flag = right;
-                }
-                if (K < 0) {
-                    max = Math.max(max, right-left);
-//                    left = flag;
-//                    flag = right;
-//                    K++;
-                    while (K < 0) {
-                        if (A[left] == 0) {
-                            K++;
-                        }
-                        left++;
+    public static int findShortestSubArray(int[] nums) {
+        int length = nums.length;
+        int max = 1, min = 1;
+        HashMap<Integer, int[]> hashMap = new HashMap<>();
+        for (int i = 0; i < length; i++) {
+            if (!hashMap.containsKey(nums[i])) {
+                hashMap.put(nums[i], new int[]{i, i, 1});
+            } else {
+                int[] temp = hashMap.get(nums[i]);
+                hashMap.put(nums[i], new int[]{temp[0], i, temp[2]+1});
+                if (temp[2]+1 > max) {
+                    min = i - temp[0] + 1;
+                    max = temp[2]+1;
+                } else if (temp[2]+1 == max) {
+                    if (i - temp[0] < min) {
+                        min = i - temp[0] + 1;
                     }
                 }
             }
-            right++;
         }
-        return Math.max(max, right-left);
+        return min;
+    }
+
+    /**
+     * 由于题目规定了nums[i]的范围, 因此也可以直接创建一个nums[i]的范围大小的数组
+     */
+    public static int findShortestSubArray_(int[] nums) {
+        int[][] count = new int[50000][3];
+        int max = 0, min = 0;
+        int length = nums.length;
+        for (int i = 0; i < 50000; i++) {
+            count[i][0] = -1;
+            count[i][1] = -1;
+        }
+        for (int i = 0; i < length; i++) {
+            if (count[nums[i]][0] == -1) {
+                count[nums[i]][0] = i;
+            }
+            count[nums[i]][1] = i;
+            count[nums[i]][2]++;
+            if (count[nums[i]][2] >= max) {
+                int value = count[nums[i]][1] - count[nums[i]][0];
+                if (value <= min || count[nums[i]][2] > max) {
+                    min = value + 1;
+                }
+                max = count[nums[i]][2];
+            }
+        }
+        return min;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(longestOnes(new int[]{0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1}, 3));
+        System.out.println(findShortestSubArray(new int[]{2,1,1,2,1,3,3,3,1,3,1,3,2}));
     }
 }
 
