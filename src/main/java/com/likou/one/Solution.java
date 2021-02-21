@@ -6,65 +6,137 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Solution {
-    /**
-     * 通过哈希表保存数组中数字最初出现的位置、最后出现的位置以及出现的频率
-     * 当遍历某个数字出现的频率最大时，该频率很可能就是数组的度，直接求初末位置之差即可
-     * 当出现两个数字的出现频率都一致时，选取两个数字的初末位置之差中较小的
-     */
-    public static int findShortestSubArray(int[] nums) {
+    public static int longestSubarray(int[] nums, int limit) {
+        Deque<Integer> add = new LinkedList<>();
+        Deque<Integer> des = new LinkedList<>();
+        int result = 0;
+        int left = 0, right = 0;
         int length = nums.length;
-        int max = 1, min = 1;
-        HashMap<Integer, int[]> hashMap = new HashMap<>();
-        for (int i = 0; i < length; i++) {
-            if (!hashMap.containsKey(nums[i])) {
-                hashMap.put(nums[i], new int[]{i, i, 1});
-            } else {
-                int[] temp = hashMap.get(nums[i]);
-                hashMap.put(nums[i], new int[]{temp[0], i, temp[2]+1});
-                if (temp[2]+1 > max) {
-                    min = i - temp[0] + 1;
-                    max = temp[2]+1;
-                } else if (temp[2]+1 == max) {
-                    if (i - temp[0] < min) {
-                        min = i - temp[0] + 1;
-                    }
-                }
+        while (right < length) {
+            while (!add.isEmpty() && add.peekLast() > nums[right]) {
+                add.pollLast();
             }
+            while (!des.isEmpty() && des.peekLast() < nums[right]) {
+                des.pollLast();
+            }
+            add.offer(nums[right]);
+            des.offer(nums[right]);
+            while (!add.isEmpty() && !des.isEmpty() && des.peekFirst()- add.peekFirst() > limit) {
+                if (nums[left] == add.peekFirst()) {
+                    add.pollFirst();
+                }
+                if (nums[left] == des.peekFirst()) {
+                    des.pollFirst();
+                }
+                left++;
+            }
+            result = Math.max(result, right-left+1);
+            right++;
         }
-        return min;
+        return result;
     }
 
     /**
-     * 由于题目规定了nums[i]的范围, 因此也可以直接创建一个nums[i]的范围大小的数组
+     * 通过滑动窗口+自平衡的排序二叉树
      */
-    public static int findShortestSubArray_(int[] nums) {
-        int[][] count = new int[50000][3];
-        int max = 0, min = 0;
+    public static int longestSubarray_2(int[] nums, int limit) {
+        int result = 0;
+        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
+        int left = 0, right = 0;
         int length = nums.length;
-        for (int i = 0; i < 50000; i++) {
-            count[i][0] = -1;
-            count[i][1] = -1;
-        }
-        for (int i = 0; i < length; i++) {
-            if (count[nums[i]][0] == -1) {
-                count[nums[i]][0] = i;
-            }
-            count[nums[i]][1] = i;
-            count[nums[i]][2]++;
-            if (count[nums[i]][2] >= max) {
-                int value = count[nums[i]][1] - count[nums[i]][0];
-                if (value <= min || count[nums[i]][2] > max) {
-                    min = value + 1;
+        while (right < length) {
+            treeMap.put(nums[right], treeMap.getOrDefault(nums[right], 0) + 1);
+            while (!treeMap.isEmpty() && treeMap.lastKey()-treeMap.firstKey() > limit) {
+                treeMap.put(nums[left], treeMap.get(nums[left]) - 1);
+                if (treeMap.get(nums[left]) == 0) {
+                    treeMap.remove(nums[left]);
                 }
-                max = count[nums[i]][2];
+                left++;
             }
+            result = Math.max(result, right-left+1);
+            right++;
         }
-        return min;
+        return result;
+    }
+
+
+    /**
+     * 使用大根堆, 小根堆, 确定区间的范围
+     */
+    public static int longestSubarray_1(int[] nums, int limit) {
+        PriorityQueue<int []> small = new PriorityQueue<>((o1, o2) -> {
+            if (o1[0] == o2[0]) {
+                return o2[1]-o1[1];
+            }
+            return o1[0]-o2[0];
+        });
+        PriorityQueue<int []> big = new PriorityQueue<>((o1, o2) -> {
+            if (o1[0] == o2[0]) {
+                return o2[1]-o1[1];
+            }
+            return o2[0]-o1[0];
+        });
+        int left = 0;
+        int right = 0;
+        int length = nums.length;
+        int result = 0;
+        boolean maxFlag = false, minFlag = false;
+        while (right < length) {
+            small.offer(new int[]{nums[right], right});
+            big.offer(new int[]{nums[right], right});
+            //移除不在范围的值
+            while (!small.isEmpty() && small.peek()[1] < left) {
+                small.poll();
+            }
+            while (!big.isEmpty() && big.peek()[1] < left) {
+                big.poll();
+            }
+            int max = Math.abs(nums[right]-big.peek()[0]);
+            int maxIndex = big.peek()[1];
+            int min = Math.abs(nums[right]-small.peek()[0]);
+            int minIndex = small.peek()[1];
+            while (!big.isEmpty() && max > limit) {
+                maxIndex = big.poll()[1];
+                //移除不在范围的值
+                while (!big.isEmpty() && big.peek()[1] < maxIndex) {
+                    big.poll();
+                }
+                max = Math.abs(nums[right]-big.peek()[0]);
+                maxFlag = true;
+            }
+            while (!small.isEmpty() && min > limit) {
+                minIndex = small.poll()[1];
+                //移除不在范围的值
+                while (!small.isEmpty() && small.peek()[1] < minIndex) {
+                    small.poll();
+                }
+                min = Math.abs(nums[right]-small.peek()[0]);
+                minFlag = true;
+            }
+            if (maxFlag || minFlag) {
+                result = Math.max(result, right-left);
+                if (maxFlag && minFlag) {
+                    //最大值发生变化
+                    left = Math.max(minIndex, maxIndex) + 1;
+                } else if (maxFlag) {
+                    //最小值发生变化
+                    left = maxIndex + 1;
+                } else {
+                    //最大值, 最小值都发生变化
+                    left = minIndex + 1;
+                }
+                maxFlag = false;
+                minFlag = false;
+            }
+            right++;
+        }
+        return Math.max(result, right-left);
     }
 
 
     public static void main(String[] args) {
-        System.out.println(findShortestSubArray(new int[]{2,1,1,2,1,3,3,3,1,3,1,3,2}));
+        System.out.println(longestSubarray(new int[]{
+                4,2,2,2,4,4,2,2}, 0));
     }
 }
 
