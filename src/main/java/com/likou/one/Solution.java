@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 class Solution {
 
     /**
-     * 遍历每一个元素(除上边界与左边界), 与它左上角元素比较即可
+     * 遍历每一个元素(除上边界与左边界),与它左上角元素比较即可
      */
     public static boolean isToeplitzMatrix(int[][] matrix) {
         int row = matrix.length;
