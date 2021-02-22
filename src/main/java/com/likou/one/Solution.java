@@ -6,137 +6,55 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Solution {
-    public static int longestSubarray(int[] nums, int limit) {
-        Deque<Integer> add = new LinkedList<>();
-        Deque<Integer> des = new LinkedList<>();
-        int result = 0;
-        int left = 0, right = 0;
-        int length = nums.length;
-        while (right < length) {
-            while (!add.isEmpty() && add.peekLast() > nums[right]) {
-                add.pollLast();
-            }
-            while (!des.isEmpty() && des.peekLast() < nums[right]) {
-                des.pollLast();
-            }
-            add.offer(nums[right]);
-            des.offer(nums[right]);
-            while (!add.isEmpty() && !des.isEmpty() && des.peekFirst()- add.peekFirst() > limit) {
-                if (nums[left] == add.peekFirst()) {
-                    add.pollFirst();
+
+    /**
+     * 遍历每一个元素(除上边界与左边界), 与它左上角元素比较即可
+     */
+    public static boolean isToeplitzMatrix(int[][] matrix) {
+        int row = matrix.length;
+        int col = matrix[0].length;
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (matrix[i][j] != matrix[i-1][j-1]) {
+                    return false;
                 }
-                if (nums[left] == des.peekFirst()) {
-                    des.pollFirst();
-                }
-                left++;
             }
-            result = Math.max(result, right-left+1);
-            right++;
         }
-        return result;
+        return true;
     }
 
     /**
-     * 通过滑动窗口+自平衡的排序二叉树
+     * 按照对角线遍历
      */
-    public static int longestSubarray_2(int[] nums, int limit) {
-        int result = 0;
-        TreeMap<Integer, Integer> treeMap = new TreeMap<>();
-        int left = 0, right = 0;
-        int length = nums.length;
-        while (right < length) {
-            treeMap.put(nums[right], treeMap.getOrDefault(nums[right], 0) + 1);
-            while (!treeMap.isEmpty() && treeMap.lastKey()-treeMap.firstKey() > limit) {
-                treeMap.put(nums[left], treeMap.get(nums[left]) - 1);
-                if (treeMap.get(nums[left]) == 0) {
-                    treeMap.remove(nums[left]);
+    public static boolean isToeplitzMatrix_1(int[][] matrix) {
+        int row = matrix.length;
+        int col = matrix[0].length;
+        for (int i = 0; i < row; i++) {
+            int x = i+1, y = 1;
+            while (x < row && y < col) {
+                if (matrix[x][y] != matrix[x-1][y-1]) {
+                    return false;
                 }
-                left++;
+                x++;
+                y++;
             }
-            result = Math.max(result, right-left+1);
-            right++;
         }
-        return result;
-    }
-
-
-    /**
-     * 使用大根堆, 小根堆, 确定区间的范围
-     */
-    public static int longestSubarray_1(int[] nums, int limit) {
-        PriorityQueue<int []> small = new PriorityQueue<>((o1, o2) -> {
-            if (o1[0] == o2[0]) {
-                return o2[1]-o1[1];
-            }
-            return o1[0]-o2[0];
-        });
-        PriorityQueue<int []> big = new PriorityQueue<>((o1, o2) -> {
-            if (o1[0] == o2[0]) {
-                return o2[1]-o1[1];
-            }
-            return o2[0]-o1[0];
-        });
-        int left = 0;
-        int right = 0;
-        int length = nums.length;
-        int result = 0;
-        boolean maxFlag = false, minFlag = false;
-        while (right < length) {
-            small.offer(new int[]{nums[right], right});
-            big.offer(new int[]{nums[right], right});
-            //移除不在范围的值
-            while (!small.isEmpty() && small.peek()[1] < left) {
-                small.poll();
-            }
-            while (!big.isEmpty() && big.peek()[1] < left) {
-                big.poll();
-            }
-            int max = Math.abs(nums[right]-big.peek()[0]);
-            int maxIndex = big.peek()[1];
-            int min = Math.abs(nums[right]-small.peek()[0]);
-            int minIndex = small.peek()[1];
-            while (!big.isEmpty() && max > limit) {
-                maxIndex = big.poll()[1];
-                //移除不在范围的值
-                while (!big.isEmpty() && big.peek()[1] < maxIndex) {
-                    big.poll();
+        for (int i = 1; i < col; i++) {
+            int x = 1, y = i+1;
+            while (x < row && y < col) {
+                if (matrix[x][y] != matrix[x-1][y-1]) {
+                    return false;
                 }
-                max = Math.abs(nums[right]-big.peek()[0]);
-                maxFlag = true;
+                x++;
+                y++;
             }
-            while (!small.isEmpty() && min > limit) {
-                minIndex = small.poll()[1];
-                //移除不在范围的值
-                while (!small.isEmpty() && small.peek()[1] < minIndex) {
-                    small.poll();
-                }
-                min = Math.abs(nums[right]-small.peek()[0]);
-                minFlag = true;
-            }
-            if (maxFlag || minFlag) {
-                result = Math.max(result, right-left);
-                if (maxFlag && minFlag) {
-                    //最大值发生变化
-                    left = Math.max(minIndex, maxIndex) + 1;
-                } else if (maxFlag) {
-                    //最小值发生变化
-                    left = maxIndex + 1;
-                } else {
-                    //最大值, 最小值都发生变化
-                    left = minIndex + 1;
-                }
-                maxFlag = false;
-                minFlag = false;
-            }
-            right++;
         }
-        return Math.max(result, right-left);
+        return true;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(longestSubarray(new int[]{
-                4,2,2,2,4,4,2,2}, 0));
+        System.out.println(isToeplitzMatrix(new int[][]{{1,2,3,4},{5,1,2,3},{9,5,1,2}}));
     }
 }
 
