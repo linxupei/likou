@@ -6,55 +6,38 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class Solution {
-
     /**
-     * 遍历每一个元素(除上边界与左边界),与它左上角元素比较即可
+     * 先统计老板没有抑制自己的情绪之前的顾客满意数
+     * 再通过滑动窗口找出最多顾客不满意X这个时段
      */
-    public static boolean isToeplitzMatrix(int[][] matrix) {
-        int row = matrix.length;
-        int col = matrix[0].length;
-        for (int i = 1; i < row; i++) {
-            for (int j = 1; j < col; j++) {
-                if (matrix[i][j] != matrix[i-1][j-1]) {
-                    return false;
-                }
+    public static int maxSatisfied(int[] customers, int[] grumpy, int X) {
+        int result = 0;
+        int max = 0;
+        int temp = 0;
+        int length = customers.length;
+        for (int i = 0; i < X; i++) {
+            if (grumpy[i] == 1) {
+                max += customers[i];
+            } else {
+                result += customers[i];
             }
         }
-        return true;
-    }
-
-    /**
-     * 按照对角线遍历
-     */
-    public static boolean isToeplitzMatrix_1(int[][] matrix) {
-        int row = matrix.length;
-        int col = matrix[0].length;
-        for (int i = 0; i < row; i++) {
-            int x = i+1, y = 1;
-            while (x < row && y < col) {
-                if (matrix[x][y] != matrix[x-1][y-1]) {
-                    return false;
-                }
-                x++;
-                y++;
+        temp = max;
+        for (int i = X; i < length; i++) {
+            temp += customers[i] * grumpy[i];
+            temp -= customers[i-X] * grumpy[i-X];
+            if (grumpy[i] == 0) {
+                result += customers[i];
             }
+            max = Math.max(max, temp);
         }
-        for (int i = 1; i < col; i++) {
-            int x = 1, y = i+1;
-            while (x < row && y < col) {
-                if (matrix[x][y] != matrix[x-1][y-1]) {
-                    return false;
-                }
-                x++;
-                y++;
-            }
-        }
-        return true;
+        return result+max;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(isToeplitzMatrix(new int[][]{{1,2,3,4},{5,1,2,3},{9,5,1,2}}));
+        System.out.println(maxSatisfied(new int[]{1,0,1,2,1,1,7,5},
+                                        new int[]{0,1,0,1,0,1,0,1}, 3));
     }
 }
 
