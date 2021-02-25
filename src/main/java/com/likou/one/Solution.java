@@ -7,30 +7,22 @@ import java.util.stream.Collectors;
 
 class Solution {
     /**
-     * 异或(^), 将两个数字化为二进制, 从高位开始比较
-     * 相同则为0, 不同则为1
-     **/
-    public static int[][] flipAndInvertImage(int[][] A) {
-        int row = A.length;
-        int col = A[0].length;
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col>>1; j++) {
-                A[i][j] ^= 1;
-                A[i][col-j-1] ^= 1;
-                int temp = A[i][j];
-                A[i][j] = A[i][col-j-1];
-                A[i][col-j-1] = temp;
-            }
-            if (col % 2 != 0) {
-                A[i][col>>1] ^= 1;
+     * 交换行列索引即可
+     */
+    public static int[][] transpose(int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] result = new int[n][m];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                result[j][i] = matrix[i][j];
             }
         }
-        return A;
+        return result;
     }
 
     public static void main(String[] args) {
-        System.out.println(flipAndInvertImage(new int[][]{{1,1,0},
-                                        {1,0,1},{0,0,0}}));
+        System.out.println(transpose(new int[][]{{1,2,3}, {4,5,6}}));
     }
 }
 
