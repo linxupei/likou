@@ -8,103 +8,109 @@ import java.util.stream.Collectors;
 class Solution {
 
     /**
-     * 使用二进制方法表示
+     * 种类+滑动窗口
+     * 本题中种类为字符串小写字母种类
      */
-    public static List<Integer> findNumOfValidWords(String[] words, String[] puzzles) {
-        List<Integer> result = new LinkedList<>();
-        HashMap<Integer, Integer> frequent = new HashMap<>();
-        //找出每一个谜底对应的二进制数, 将相同的合并, 频率加1
-        for (String word : words) {
-            int length = word.length();
-            int mask = 0;
-            for (int i = 0; i < length; i++) {
-                mask |= (1 << (word.charAt(i)-'a'));
-            }
-            if (Integer.bitCount(mask) <= 7) {
-                frequent.put(mask, frequent.getOrDefault(mask, 0) + 1);
-            }
-        }
-        for (String puzzle : puzzles) {
-            int length = puzzle.length();
-            int count = 0;
-            int mask = 0;
-            for (int i = 1; i < length; i++) {
-                mask |= (1 << (puzzle.charAt(i)-'a'));
-            }
-            int subset = mask;
-            //找二进制子集普通方法
-            do {
-                //使每一个二进制子集, 都包含谜面首字母
-                int s = subset | (1 << (puzzle.charAt(0)-'a'));
-                if (frequent.containsKey(s)) {
-                    count += frequent.get(s);
+    public static int longestSubstring(String s, int k) {
+        int result = 0;
+        int length = s.length();
+        for (int i = 1; i <= 26; i++) {
+            int l = 0, r = 0;
+            //统计[l, r]区间的字母频率
+            int[] frequent = new int[26];
+            //总的种类
+            int total = 0;
+            //少于k的种类
+            int less = 0;
+            while (r < length) {
+                int index = s.charAt(r)-'a';
+                frequent[index]++;
+                //这是一个全新的种类
+                if (frequent[index] == 1) {
+                    total++;
+                    less++;
                 }
-                subset = (subset-1) & mask;
-            } while (subset != mask);
-            result.add(count);
+                //这个种类达到了最低标准
+                if (frequent[index] == k) {
+                    less--;
+                }
+                while (total > i) {
+                    index = s.charAt(l)-'a';
+                    frequent[index]--;
+                    //这个种类无法达到最低标准
+                    if (frequent[index] == k-1) {
+                        less++;
+                    }
+                    //这个种类被移除了
+                    if (frequent[index] == 0) {
+                        total--;
+                        less--;
+                    }
+                    l++;
+                }
+                //没有一个种类无法达到标准
+                if (less == 0) {
+                    result = Math.max(result, r-l+1);
+                }
+                r++;
+            }
         }
         return result;
     }
 
     /**
-     * 暴力不可取, 超时需谨慎
+     * 分治, 每一个不足k次的字母都可以作为一个分隔线, 将字符串分隔成若干部分
      */
-    public static List<Integer> findNumOfValidWords_1(String[] words, String[] puzzles) {
-        int pLength  = puzzles.length;
-        int wLength = words.length;
-        List<Integer> result = new LinkedList<>();
-        boolean[][] keywords = new boolean[pLength][26];
-        boolean[][] wordFrequents = new boolean[wLength][26];
-        //统计每一个puzzle所含有的字母
-        for (int i = 0; i < pLength; i++) {
-            int length = puzzles[i].length();
-            for (int j = 0; j < length; j++) {
-                keywords[i][puzzles[i].charAt(j)-'a'] = true;
+    public static int longestSubstring_(String s, int k) {
+        int length = s.length();
+        return dfs(s, 0, length-1, k);
+    }
+
+    public static int dfs(String s, int l, int r, int k) {
+        int[] frequent = new int[26];
+        //统计某一个子串的字母数量
+        for (int i = l; i <= r; i++) {
+            frequent[s.charAt(i)-'a']++;
+        }
+
+        //找到一个分隔符
+        //注: 为什么不是找第一个分隔符?
+        //由于子串可能过长, 且在后续的递归中, 会继续找分隔, 因此不必
+        char split = 0;
+        for (int i = 0; i < 26; i++) {
+            if (frequent[i] > 0 && frequent[i] < k) {
+                split = (char) (i+'a');
+                break;
             }
         }
-        //统计每一个word包含的字母
-        for (int i = 0; i < wLength; i++) {
-            int length = words[i].length();
-            for (int j = 0; j < length; j++) {
-                wordFrequents[i][words[i].charAt(j)-'a'] = true;
-            }
+
+        //若没有分隔符, 说明当前子串符合要求
+        if (split == 0) {
+            return r-l+1;
         }
-        for (int i = 0; i < pLength; i++) {
-            int count = 0;
-            char first = puzzles[i].charAt(0);
-            for (int j = 0; j < wLength; j++) {
-                boolean flag = true;
-                for (int k = 0; k < 26; k++) {
-                    if (wordFrequents[j][k] && wordFrequents[j][k] != keywords[i][k]) {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag && wordFrequents[j][first-'a']) {
-                    count++;
-                }
+
+        int i = l;
+        int result = 0;
+        while (i <= r) {
+            //找到一个非分隔符的位置
+            while (i <= r && s.charAt(i) == split) {
+                i++;
             }
-            result.add(count);
+            if (i > r) {
+                break;
+            }
+            int start = i;
+            while (i <= r && s.charAt(i) != split) {
+                i++;
+            }
+            int length = dfs(s, start, i-1, k);
+            result = Math.max(length, result);
         }
         return result;
     }
 
     public static void main(String[] args) {
-//        int mask = 0;
-//        String str = "aboveyz";
-//        for (int i = 0; i < str.length(); i++) {
-//            char ch = str.charAt(i);
-//            int temp = (1 << (ch - 'a'));
-//            mask |= temp;
-//        }
-//        int subset = mask;
-//        do {
-//            subset = (subset - 1) & mask;
-//        } while (subset != mask);
-//        System.out.println(mask);
-        System.out.println(findNumOfValidWords(
-                new String[]{"aaaa","asas","able","ability","actt","actor","access"},
-                new String[]{"aboveyz","abrodyz","abslute","absoryz","actresz","gaswxyz"}));
+        System.out.println(longestSubstring("ababbc", 2));
     }
 }
 
