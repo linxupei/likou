@@ -8,30 +8,30 @@ import java.util.stream.Collectors;
 class Solution {
 
     /**
-     * 只需要判断是否同时存在递增和递减的情况
-     * 若不存在则为单调
-     * add判断是否存在递增
-     * sub判断是否存在递减
+     * 前缀和
      */
-    public static boolean isMonotonic(int[] A) {
-        boolean add = false, sub = false;
-        int length = A.length;
-        for (int i = 1; i < length; i++) {
-            if (A[i] > A[i-1]) {
-                add = true;
-            }
-            if (A[i] < A[i-1]) {
-                sub = true;
-            }
-            if (add && sub) {
-                return false;
+    class NumArray {
+        private int[] nums;
+        private int[] sum;
+
+
+        public NumArray(int[] nums) {
+            int length = nums.length;
+            this.nums = new int[length];
+            sum = new int[length+1];
+            for (int i = 0; i < length; i++) {
+                this.nums[i] = nums[i];
+                sum[i+1] = sum[i] + nums[i];
             }
         }
-        return true;
+
+        public int sumRange(int i, int j) {
+            return sum[j] - sum[i];
+        }
     }
 
     public static void main(String[] args) {
-        System.out.println(isMonotonic(new int[]{6,5,4,4}));
+        System.out.println();
     }
 }
 
