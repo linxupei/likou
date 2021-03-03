@@ -8,41 +8,53 @@ import java.util.stream.Collectors;
 class Solution {
 
     /**
-     * 利用区域前缀和即可
+     * bits[i]表示数字i的二进制数的1的个数
+     * 最高有效位计算
+     * 设0<x<=y, y为x的最高位（例:X=101, Y=100），z=x-y
+     * 则bits[x] = bit[x-y]+1;
      */
-    static class NumMatrix {
-        private int[][] matrix;
-
-        public NumMatrix(int[][] matrix) {
-            int row = matrix.length;
-            if (row == 0) {
-                return;
+    public int[] countBits(int num) {
+        int height = 0;
+        int[] bits = new int[num+1];
+        for (int i = 1; i <= num; i++) {
+            if ((i & (i-1)) == 0) {
+                height = i;
             }
-            int col = matrix[0].length;
-            if (col == 0) {
-                return;
-            }
-            this.matrix = new int[row + 1][col + 1];
-            for (int i = 1; i <= row; i++) {
-                for (int j = 1; j <= col; j++) {
-                    this.matrix[i][j] = this.matrix[i - 1][j] + this.matrix[i][j - 1] + matrix[i - 1][j - 1] - this.matrix[i - 1][j - 1];
-                }
-            }
+            bits[i] = bits[i-height] + 1;
         }
+        return bits;
+    }
 
-        public int sumRegion(int row1, int col1, int row2, int col2) {
-            return matrix[row2 + 1][col2 + 1] - matrix[row1][col2 + 1] - matrix[row2 + 1][col1] + matrix[row1][col1];
+    /**
+     * bits[i]表示数字i的二进制数的1的个数
+     * 最低有效位计算
+     * 对于bits[x], 如果知道bits[(x>>1)]
+     * 当x等于偶数的时候 bits[x] = bits[(x>>1)]
+     * 当x等于奇数的时候 bits[x] = bits[(x>>1)] + 1
+     */
+    public int[] countBits_2(int num) {
+        int[] bits = new int[num+1];
+        for (int i = 1; i <= num; i++) {
+            bits[i] = bits[i>>1] + (i&1);
         }
+        return bits;
+    }
+
+    /**
+     * bits[i]表示数字i的二进制数的1的个数
+     * 最低设置位计算(即数字的二进制最小的1所在的位置)
+     * 令y = x & (x-1), 将x的最低设置为变为0，则bits[x] = bits[y] + 1
+     */
+    public static int[] countBits_1(int num) {
+        int[] bits = new int[num+1];
+        for (int i = 1; i <= num; i++) {
+            bits[i] = bits[i & (i-1)] + 1;
+        }
+        return bits;
     }
 
     public static void main(String[] args) {
-        NumMatrix temp = new NumMatrix(new int[][]{
-                {3, 0, 1, 4, 2},
-                {5, 6, 3, 2, 1},
-                {1, 2, 0, 1, 5},
-                {4, 1, 0, 1, 7},
-                {1, 0, 3, 0, 5}});
-        System.out.println(temp.sumRegion(2, 1, 4, 3));
+
     }
 }
 
