@@ -7,35 +7,28 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class Solution {
-    public static int minCut(String s) {
-        int n = s.length();
-        boolean f[][] = new boolean[n][n];
-        int g[] = new int[n];
-        for (int i = 0; i < n; i++) {
-            Arrays.fill(f[i], true);
-        }
-        Arrays.fill(g, Integer.MAX_VALUE);
-        for (int i = n - 1; i >= 0; i--) {
-            for (int j = i + 1; j < n; j++) {
-                f[i][j] = f[i+1][j-1] && (s.charAt(i) == s.charAt(j));
-            }
-        }
-        for (int i = 0; i < n; i++) {
-            if (f[0][i]) {
-                g[i] = 0;
-            } else {
-                for (int j = 0; j < i; j++) {
-                    if (f[j+1][i]) {
-                        g[i] = Math.min(g[i], g[j] + 1);
-                    }
+    /**
+     * 遇到两个相同字符, 删除两个相同的字符后, 若下标大于0, 则后退一位
+     * 若两个字符不同则前进一位
+     */
+    public static String removeDuplicates(String S) {
+        StringBuffer stringBuffer = new StringBuffer(S);
+        int index = 0;
+        while (stringBuffer.length() > 0 && index < stringBuffer.length() - 1) {
+            if (stringBuffer.length() > 1 && stringBuffer.charAt(index) == stringBuffer.charAt(index+1)) {
+                stringBuffer.delete(index, index+2);
+                if (index > 0) {
+                    index--;
                 }
+            } else {
+                index++;
             }
         }
-        return g[n-1];
+        return stringBuffer.toString();
     }
 
     public static void main(String[] args) {
-        minCut("abbab");
+        System.out.println(removeDuplicates("a"));
     }
 }
 
