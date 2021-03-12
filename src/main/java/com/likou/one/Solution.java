@@ -16,7 +16,7 @@ class Solution {
      * 遇到一个'#', 坑位减少一个
      * 遇到一个数字, 坑位减少一个的同时增加两个
      */
-    public boolean isValidSerialization1(String preorder) {
+    public static boolean isValidSerialization1(String preorder) {
         Deque<Integer> stack = new LinkedList<>();
         int length = preorder.length();
         int index = 0;
