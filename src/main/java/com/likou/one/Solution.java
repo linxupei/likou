@@ -11,76 +11,51 @@ import java.util.stream.Collectors;
 class Solution {
 
     /**
-     * 采用填坑的方式
-     * 初始时只有一个坑, 即根节点
-     * 遇到一个'#', 坑位减少一个
-     * 遇到一个数字, 坑位减少一个的同时增加两个
+     * 先处理'*','/', 再处理'+','-',
+     * 用preSign记录上一个符号
+     * 要注意处理最后一个数字
      */
-    public static boolean isValidSerialization1(String preorder) {
-        Deque<Integer> stack = new LinkedList<>();
-        int length = preorder.length();
-        int index = 0;
-        stack.push(1);
-        while (index < length) {
-            if (stack.isEmpty()) {
-                return false;
+    public static int calculate(String s) {
+        Stack<Integer> stack = new Stack<>();
+        char preSign = '+';
+        int n = s.length();
+        int num = 0;
+        int total = 0;
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            if (Character.isDigit(ch)) {
+                num = num * 10 + (ch - '0');
             }
-            if (preorder.charAt(index) == ',') {
-                index++;
-            } else if (preorder.charAt(index) == '#') {
-                int count = stack.pop() - 1;
-                if (count > 0) {
-                    stack.push(count);
+            if (!Character.isDigit(ch) && ch != ' ' || i == n - 1) {
+                switch (preSign) {
+                    case '+':
+                        stack.push(num);
+                        break;
+                    case '-':
+                        stack.push(-num);
+                        break;
+                    case '*':
+                        stack.push(stack.pop() * num);
+                        break;
+                    case '/':
+                        stack.push(stack.pop() / num);
+                        break;
+                    default:
+                        break;
                 }
-                index++;
-            } else {
-                while (index < length && preorder.charAt(index) != ',') {
-                    index++;
-                }
-                int count = stack.pop() - 1;
-                if (count > 0) {
-                    stack.push(count);
-                }
-                stack.push(2);
+                num = 0;
+                preSign = ch;
             }
         }
-        return stack.isEmpty();
-    }
-
-    /**
-     * 采用填坑的方式
-     * 经过分析可知, 填坑的时候可以忽略坑所在结点,
-     * 只要统计坑的数量即可
-     * 初始时只有一个坑, 即根节点
-     * 遇到一个'#', 坑位减少一个
-     * 遇到一个数字, 坑位减少一个的同时增加两个
-     */
-    public static boolean isValidSerialization(String preorder) {
-        int total = 1;
-        int length = preorder.length();
-        int index = 0;
-        while (index < length) {
-            if (total == 0) {
-                return false;
-            }
-            if (preorder.charAt(index) == ',') {
-                index++;
-            } else if (preorder.charAt(index) == '#') {
-                total--;
-                index++;
-            } else {
-                while (index < length && preorder.charAt(index) != ',') {
-                    index++;
-                }
-                total++;
-            }
+        while (!stack.isEmpty()) {
+            total += stack.pop();
         }
-        return total == 0;
+        return total;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(isValidSerialization("1 + 2 * 3"));
+        System.out.println(calculate("1 + 2 * 3"));
     }
 }
 
