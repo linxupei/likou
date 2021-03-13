@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class Solution {
 
     /**
-     * 普通的哈希映射
+     * 平平无奇的哈希映射
      */
     class MyHashMap {
         private static final int BASE = 769;
