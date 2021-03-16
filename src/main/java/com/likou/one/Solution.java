@@ -72,7 +72,7 @@ public class Solution {
     /**
      * Ë³Ê±Õë
      */
-    public int[][] generateMatrix1(int n) {
+    public static int[][] generateMatrix(int n) {
         int[][] result = new int[n][n];
         int total = n * n;
         boolean[][] judge = new boolean[n][n];
@@ -93,7 +93,7 @@ public class Solution {
         return result;
     }
 
-    public static int[][] generateMatrix(int n) {
+    public static int[][] generateMatrix1(int n) {
         int[][] result = new int[n][n];
         int left = 0, right = n - 1, top = 0, bottom = n - 1;
         int index = 1, total = n * n;
