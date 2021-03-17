@@ -11,115 +11,40 @@ import java.util.stream.Collectors;
 
 public class Solution {
     /**
-     * 层次遍历
+     * m = s.length(), n = t.length()
+     * dp[i][j]在s[i:]中t[j]出现的次数(s[i:]表示字符串的子串s.sub(i,s.length()))
+     * 当i>=m 且 j<n 时 s[i:]为空串, 因此dp[i][j] = 0;
+     * 当j>=n 时, t[j:]为空串, 空串可以是任何字符串的子串
+     * 当i<m 且 j<n 时,
+     *      若s[i]==t[j],
+     *          当选择s[i]与t[j]匹配的时候, 则考虑t[j+1:]作为s[t+1:]的子序列, 字序列数为dp[i+1][j+1]
+     *          当不选择s[i]与t[j]匹配的时候, 则考虑t[j:]作为s[t+1:]的子序列, 字序列数为dp[i+1][j]
+     *          如:s="bagag",t="bag", s[4]==t[2], 可以匹配, 也可以选择不匹配, 不匹配则为s[0]s[1]s[2]
+     *          因此dp[i][j]=dp[i+1][j+1]+dp[i+1][j]
+     *      若s[i]!=t[j],
+     *          dp[i][j]=dp[i+1][j]
      */
-    public static List<Integer> spiralOrder(int[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int n = rows * cols;
-        List<Integer> result = new ArrayList<>(n);
-        int left = 0, right = cols - 1, top = 0, bottom = rows - 1;
-        while (left <= right && top <= bottom) {
-            for (int i = left; i <= right; i++) {
-                result.add(matrix[top][i]);
-            }
-            for (int i = top + 1; i <= bottom; i++) {
-                result.add(matrix[i][right]);
-            }
-            if (left < right && top < bottom) {
-                for (int i = right - 1; i > left; i--) {
-                    result.add(matrix[bottom][i]);
-                }
-                for (int i = bottom; i > top; i--) {
-                    result.add(matrix[i][left]);
+    public static int numDistinct(String s, String t) {
+        int m = s.length(), n = t.length();
+        int[][] dp = new int[m+1][n+1];
+        for (int i = 0; i <= m; i++) {
+            dp[i][n] = 1;
+        }
+        for (int i = m - 1; i >= 0; i--) {
+            char ch = s.charAt(i);
+            for (int j = n - 1; j >= 0; j--) {
+                if (ch == t.charAt(j)) {
+                    dp[i][j] = dp[i+1][j+1] + dp[i+1][j];
+                } else {
+                    dp[i][j] = dp[i+1][j];
                 }
             }
-            left++;
-            top++;
-            right--;
-            bottom--;
         }
-        return result;
-    }
-
-    /**
-    * 模拟顺时针遍历
-    **/
-    public static List<Integer> spiralOrder1(int[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int n = rows * cols;
-        boolean[][] judge = new boolean[rows][cols];
-        int row = 0, col = 0;
-        List<Integer> result = new ArrayList<>(n);
-        int[][] directions = new int[][]{{0,1},{1,0},{0,-1},{-1,0}};
-        int index = 0;
-        for (int i = 0; i < n; i++) {
-            result.add(matrix[row][col]);
-            judge[row][col] = true;
-            //判断下一个位置是否超出边界或者已经遍历过
-            int nrow = row + directions[index][0];
-            int ncol = col + directions[index][1];
-            if (nrow < 0 || nrow >= rows || ncol < 0 || ncol >= cols || judge[nrow][ncol]) {
-                index = (index + 1) % 4;
-            }
-            row += directions[index][0];
-            col += directions[index][1];
-        }
-        return result;
-    }
-
-    /**
-     * 顺时针
-     */
-    public static int[][] generateMatrix(int n) {
-        int[][] result = new int[n][n];
-        int total = n * n;
-        boolean[][] judge = new boolean[n][n];
-        int row = 0, col = 0, index = 0;
-        int[][] directions = new int[][]{{0,1},{1,0},{0,-1},{-1,0}};
-        for (int i = 0; i < total; i++) {
-            result[row][col] = i + 1;
-            judge[row][col] = true;
-            //判断下一个位置是否超出边界或者已经遍历过
-            int nrow = row + directions[index][0];
-            int ncol = col + directions[index][1];
-            if (nrow < 0 || nrow >= n || ncol < 0 || ncol >= n || judge[nrow][ncol]) {
-                index = (index + 1) % 4;
-            }
-            row += directions[index][0];
-            col += directions[index][1];
-        }
-        return result;
-    }
-
-    public static int[][] generateMatrix1(int n) {
-        int[][] result = new int[n][n];
-        int left = 0, right = n - 1, top = 0, bottom = n - 1;
-        int index = 1, total = n * n;
-        while (index <= total) {
-            for (int i = left; i <= right; i++) {
-                result[top][i] = index++;
-            }
-            for (int i = top + 1; i <= bottom; i++) {
-                result[i][right] = index++;
-            }
-            for (int i = right - 1; i >= left; i--) {
-                result[bottom][i] = index++;
-            }
-            for (int i = bottom - 1; i > top; i--) {
-                result[i][left] = index++;
-            }
-            left++;
-            top++;
-            right--;
-            bottom--;
-        }
-        return result;
+        return dp[0][0];
     }
 
     public static void main(String[] args) {
-        generateMatrix(3);
+        System.out.println(numDistinct("rabbbit", "rabbit"));
         //spiralOrder(new int[][]{{1,2,3},{4,5,6},{7,8,9}});
     }
 }
