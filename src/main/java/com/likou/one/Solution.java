@@ -76,7 +76,7 @@ public class Solution {
      * 假设链表为1->2->3->4->5->6->null
      * 经过遍历一部分之后1->2-3->6<-5<-4
      * 要使6指向3, 则3.next.next=3;
-     * 再让3.next=null
+     * 再让3.next=null即可
      */
     public ListNode reverseList(ListNode head) {
         if (head == null || head.next == null) {
