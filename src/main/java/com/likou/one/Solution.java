@@ -12,76 +12,91 @@ import java.util.stream.Collectors;
 
 public class Solution {
     /**
-     * 使用该方法效率极低
+     * 使用第一行第一列作为记录某一行某一列是否需要变为0
+     * 开始前要记录第一行第一列是否含有0,如果有
+     * 在最后需要将第一行或第一列变为0
      */
-    public static int evalRPN1(String[] tokens) {
-        int top0, top1 = 0, top2 = 0;
-        Deque<Integer> stack = new LinkedList<>();
-        for (String str : tokens) {
-            try {
-                top0 = Integer.parseInt(str);
-                stack.push(top0);
-            } catch (Exception e) {
-                top1 = stack.pop();
-                top2 = stack.pop();
-                if (str.equals("+")) {
-                    stack.push(top2 + top1);
-                } else if (str.equals("-")) {
-                    stack.push(top2 - top1);
-                } else if (str.equals("*")) {
-                    stack.push(top2 * top1);
-                } else if (str.equals("/")) {
-                    stack.push(top2 / top1);
+    public void setZeroes(int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        boolean rowFlag = false, colFlag = false;
+        for (int i = 0; i < m; i++) {
+            if (matrix[0][i] == 0) {
+                rowFlag = true;
+                break;
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (matrix[i][0] == 0) {
+                colFlag = true;
+                break;
+            }
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (matrix[i][j] == 0) {
+                    matrix[i][0] = matrix[0][j] = 0;
                 }
             }
         }
-        return stack.pop();
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (rowFlag) {
+            for (int i = 0; i < m; i++) {
+                matrix[0][i] = 0;
+            }
+        }
+        if (colFlag) {
+            for (int i = 0; i < n; i++) {
+                matrix[i][0] = 0;
+            }
+        }
     }
 
     /**
-     * 正经方法
-     * 可使用数组代替
-     * 对于一个有效的波兰表达式字符串个数为奇数
-     * 数字刚好比运算符多一个
-     * 即数字(n+1)>>1, 运算符(n-1)>>1
-     * 即考虑最坏情况,字符串数组前面全部是数字, 最多需要空间(n+1)>>1
+     * 使用额外空间O(m +　n)用于保存某一行某一列需要变为0
      */
-    public static int evalRPN(String[] tokens) {
-        int top1 = 0, top2 = 0;
-        Deque<Integer> stack = new LinkedList<>();
-        for (String str : tokens) {
-            if (str.equals("+")) {
-                top1 = stack.pop();
-                top2 = stack.pop();
-                stack.push(top2 + top1);
-            } else if (str.equals("-")) {
-                top1 = stack.pop();
-                top2 = stack.pop();
-                stack.push(top2 - top1);
-            } else if (str.equals("*")) {
-                top1 = stack.pop();
-                top2 = stack.pop();
-                stack.push(top2 * top1);
-            } else if (str.equals("/")) {
-                top1 = stack.pop();
-                top2 = stack.pop();
-                stack.push(top2 / top1);
-            } else {
-                stack.push(Integer.parseInt(str));
+    public void setZeroes1(int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        boolean[] row = new boolean[m];
+        boolean[] col = new boolean[n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == 0) {
+                    row[i] = true;
+                    col[j] = true;
+                }
             }
         }
-        return stack.pop();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (row[i] || col[j]) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
     }
 
+    public static void toZero(int row, int col, int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        for (int i = 0; i < n; i++) {
+            if (matrix[row][i] == 0) {
+                toZero(row, i, matrix);
+            }
+        }
+    }
+
+
+
     public static void main(String[] args) {
-        int i=10 ;
-        List list = null;
-        Set set = null;
-        HashMap<Integer, Integer> hashMap = new HashMap<>();
-        //hashMap.put(null, 1);
-        Hashtable<Integer, Integer> hashtable = new Hashtable<>();
-        hashtable.put(1, null);
-        System.out.println(i++==10 ? ++i : --i);
+
     }
 }
 
