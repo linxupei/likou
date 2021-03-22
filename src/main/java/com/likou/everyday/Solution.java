@@ -1,13 +1,4 @@
-package com.likou.one;
-
-import com.sun.deploy.util.StringUtils;
-import netscape.security.UserTarget;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+package com.likou.everyday;
 
 
 public class Solution {
