@@ -14,7 +14,7 @@ public class Solution {
     /**
      * 普通的求二进制含有1的个数的方法
      */
-    public int hammingWeight1(int n) {
+    public int hammingWeight(int n) {
         Integer.bitCount(n);
         int count = 0;
         while (n != 0) {
@@ -29,7 +29,7 @@ public class Solution {
     /**
      * 汉明解法
      */
-    public int hammingWeight(int n) {
+    public int hammingWeight1(int n) {
         n = (n & 0x55555555) + ((n >> 1) & 0x55555555);
         n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
         n = (n & 0x0F0F0F0F) + ((n >> 4) & 0x0F0F0F0F);
