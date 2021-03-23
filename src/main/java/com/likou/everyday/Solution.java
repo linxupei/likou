@@ -1,33 +1,61 @@
 package com.likou.everyday;
 
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 public class Solution {
+    public interface NestedInteger {
+
+        // @return true if this NestedInteger holds a single integer, rather than a nested list.
+        public boolean isInteger();
+
+        // @return the single integer that this NestedInteger holds, if it holds a single integer
+        // Return null if this NestedInteger holds a nested list
+        public Integer getInteger();
+
+        // @return the nested list that this NestedInteger holds, if it holds a nested list
+        // Return null if this NestedInteger holds a single integer
+        public List<NestedInteger> getList();
+    }
+
     /**
-     * 普通的求二进制含有1的个数的方法
+     * 注意: 不需要实现NestedInteger接口, 注意题目说明
+     * 使用深度优先遍历将所有数据存储到列表即可
+     * 使用ArrayList是因为测试数据更多使用next()函数, 获取数据时间复杂度为O(1)
      */
-    public int hammingWeight(int n) {
-        Integer.bitCount(n);
-        int count = 0;
-        while (n != 0) {
-            //通过该式可减少二进制的最低的1
-            //10110 & (10101) = 10100
-            n = (n & (n-1));
-            count++;
+    public class NestedIterator implements Iterator<Integer> {
+        List<Integer> integerList;
+        Integer index;
+
+        public NestedIterator(List<NestedInteger> nestedList) {
+            index = 0;
+            integerList = new ArrayList<>();
+            getList(integerList, nestedList);
         }
-        return count;
-    }
 
-    /**
-     * 汉明解法
-     */
-    public int hammingWeight1(int n) {
-        n = (n & 0x55555555) + ((n >> 1) & 0x55555555);
-        n = (n & 0x33333333) + ((n >> 2) & 0x33333333);
-        n = (n & 0x0F0F0F0F) + ((n >> 4) & 0x0F0F0F0F);
-        n = (n * 0x01010101 >> 24);
-        return n;
-    }
+        public void getList(List<Integer> integerList, List<NestedInteger> nestedList) {
+            for (NestedInteger nested : nestedList) {
+                if (nested.isInteger()) {
+                    integerList.add(nested.getInteger());
+                } else {
+                    getList(integerList, nested.getList());
+                }
+            }
+        }
 
+        @Override
+        public Integer next() {
+            return integerList.get(index++);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return index < integerList.size();
+        }
+    }
 
 
     public static void main(String[] args) {
