@@ -6,7 +6,7 @@ import java.util.*;
 public class Solution {
 
     /**
-     * 普普通通删除重复结点
+     * 普普通通的删除重复结点
      */
     public ListNode deleteDuplicates(ListNode head) {
         if (head == null) {
