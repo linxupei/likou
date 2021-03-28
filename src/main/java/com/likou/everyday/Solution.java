@@ -3,42 +3,63 @@ package com.likou.everyday;
 
 import java.util.*;
 
-public class Solution {
+class BSTIterator {
+
+    List<Integer> valueList;
+    int index;
+    int size;
+
+    public BSTIterator(TreeNode root) {
+        valueList = new ArrayList<>();
+        middleTraversal(root);
+        index = 0;
+        size = valueList.size();
+    }
 
     /**
-     * 先统计长度, 然后找到断点(count - (k % count))
+     * 中序遍历把所有数据加入valueList
      */
-    public ListNode rotateRight(ListNode head, int k) {
-        if (head == null || head.next == null || k == 0) {
-            return head;
+    public void middleTraversal1(TreeNode root) {
+        TreeNode current = root;
+        Deque<TreeNode> stack = new LinkedList<>();
+        while (current != null || !stack.isEmpty()) {
+            while (current != null) {
+                stack.push(current);
+                current = current.left;
+            }
+            if (!stack.isEmpty()) {
+                current = stack.pop();
+                valueList.add(current.val);
+                current = current.right;
+            }
         }
-        ListNode tempHead = head;
-        ListNode result = new ListNode();
-        ListNode tail = null;
-        int count = 0;
-        while (tempHead != null) {
-            tail = tempHead;
-            tempHead = tempHead.next;
-            count++;
-        }
-        int changeCount = k % count;
-        if (changeCount == 0) {
-            return head;
-        }
-        tempHead = head;
-        for (int i = 1; i < count - changeCount; i++) {
-            tempHead = tempHead.next;
-        }
-        result.next = tempHead.next;
-        tempHead.next = null;
-        tail.next = head;
-//        tempHead = result.next;
-//        while (tempHead != null && tempHead.next != null) {
-//            tempHead = tempHead.next;
-//        }
-//        tempHead.next = head;
-        return result.next;
     }
+
+    public void middleTraversal(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        if (root.left != null) {
+            middleTraversal(root.left);
+        }
+        valueList.add(root.val);
+        if (root.right != null) {
+            middleTraversal(root.right);
+        }
+    }
+
+    public int next() {
+        return valueList.get(index++);
+    }
+
+    public boolean hasNext() {
+        return index < size;
+    }
+}
+
+public class Solution {
+
+
 
 
     public static void main(String[] args) {
