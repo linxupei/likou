@@ -3,67 +3,38 @@ package com.likou.everyday;
 
 import java.util.*;
 
-class BSTIterator {
 
-    List<Integer> valueList;
-    int index;
-    int size;
-
-    public BSTIterator(TreeNode root) {
-        valueList = new ArrayList<>();
-        middleTraversal(root);
-        index = 0;
-        size = valueList.size();
-    }
-
-    /**
-     * 中序遍历把所有数据加入valueList
-     */
-    public void middleTraversal1(TreeNode root) {
-        TreeNode current = root;
-        Deque<TreeNode> stack = new LinkedList<>();
-        while (current != null || !stack.isEmpty()) {
-            while (current != null) {
-                stack.push(current);
-                current = current.left;
-            }
-            if (!stack.isEmpty()) {
-                current = stack.pop();
-                valueList.add(current.val);
-                current = current.right;
-            }
-        }
-    }
-
-    public void middleTraversal(TreeNode root) {
-        if (root == null) {
-            return;
-        }
-        if (root.left != null) {
-            middleTraversal(root.left);
-        }
-        valueList.add(root.val);
-        if (root.right != null) {
-            middleTraversal(root.right);
-        }
-    }
-
-    public int next() {
-        return valueList.get(index++);
-    }
-
-    public boolean hasNext() {
-        return index < size;
-    }
-}
 
 public class Solution {
 
+    /**
+     * 循环取出每一个位二进制, 放到相应位置
+     */
+    public int reverseBits1(int n) {
+        int result = 0;
+        for (int i = 0; i < 32 && n != 0; i++) {
+            result |= (n & 1) << (31 - i);
+            n = n >>> 1;
+        }
+        return result;
+    }
 
+    /**
+     * 分治
+     * n = n1n2
+     * (n1X-->Xn1,   Xn2-->n2X)-->n2n1
+     */
+    public int reverseBits(int n) {
+        n = (n >>> 1 & 0x55555555) | ((n & 0x55555555) << 1);
+        n = (n >>> 2 & 0x33333333) | ((n & 0x33333333) << 2);
+        n = (n >>> 4 & 0x0F0F0F0F) | ((n & 0x0F0F0F0F) << 4);
+        n = (n >>> 8 & 0x00FF00FF) | ((n & 0x00FF00FF) << 8);
+        return n >>> 16 | n << 16;
+    }
 
 
     public static void main(String[] args) {
-
+        System.out.println(Integer.toBinaryString(-3));
     }
 }
 
