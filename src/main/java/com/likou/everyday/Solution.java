@@ -6,42 +6,68 @@ import java.util.*;
 
 
 public class Solution {
+    /**
+     * 采用地板除法
+     * N * (N-1) / (N-2) = N + 1;
+     * N * (N-1) / (N-2) + (N-3) - (N-4) * (N-5) / (N-6)
+     * (N-3) == (N-4) * (N-5) / (N-6), 后面没四项都为0
+     */
+    public static int clumsy(int N) {
+        if (N == 1) {
+            return 1;
+        } else if (N == 2) {
+            return 2;
+        } else if (N == 3) {
+            return 6;
+        } else if (N == 4) {
+            return 7;
+        }
+
+        if (N % 4 == 0) {
+            return N + 1;
+        } else if (N % 4 <= 2) {
+            return N + 2;
+        } else {
+            return N - 1;
+        }
+    }
 
     /**
-     * 从右上角开始, target大于当前值则向下走, 小于则向左走
+     * 遍历每一个数字, 使用flag作为判断运算符标志
      */
-    public boolean searchMatrix(int[][] matrix, int target) {
-        int row = matrix.length;
-        int col = matrix[0].length;
-        int x = col - 1, y = 0;
-        while (true) {
-            if (matrix[y][x] < target) {
-                //target小于当前下标的正右结点, 说明target位于两个结点之间, 找不到目标
-                if (x < col - 1 && matrix[y][x+1] > target) {
+    public static int clumsy1(int N) {
+        int result = 0;
+        int flag = 0;
+        int temp = 1;
+        for (int i = N; i > 0; i--) {
+            switch (flag++ % 4) {
+                case 0:
+                case 1:
+                    temp *= i;
                     break;
-                }
-                y++;
-                //越界
-                if (y < 0 || y >= row) {
+                case 2:
+                    temp /= i;
+                    result += temp;
+                    temp = -1;
                     break;
-                }
-            } else if (matrix[y][x] > target) {
-                x--;
-                //越界
-                if (x < 0 || x >= col) {
+                case 3:
+                    result += i;
                     break;
-                }
-            } else {
-                return true;
+                default:
+                    break;
             }
         }
-        return false;
+        //当flag等于1或者2时说明result还没有进行相加就退出循环了,因此需要加回来
+        if (flag % 4 < 3 && flag % 4 > 0) {
+            result += temp;
+        }
+        return result;
     }
 
 
 
-    public void main(String[] args) {
-
+    public static void main(String[] args) {
+        System.out.println(clumsy(4));
     }
 }
 
