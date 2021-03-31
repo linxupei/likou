@@ -16,6 +16,7 @@ public class Solution {
     public List<List<Integer>> subsetsWithDup(int[] nums) {
         List<List<Integer>> results = new ArrayList<>();
         List<Integer> clr = new ArrayList<>();
+        Arrays.sort(nums);
         dfs_subsets(results, clr, false, nums, 0);
         return results;
     }
@@ -23,6 +24,7 @@ public class Solution {
     public void dfs_subsets(List<List<Integer>> results, List<Integer> clr, boolean choosePre, int[] nums, int start) {
         if (start >= nums.length) {
             results.add(new ArrayList<>(clr));
+            return;
         }
         dfs_subsets(results, clr, false, nums, start + 1);
         //nums = 1,2,2,2
@@ -144,7 +146,7 @@ public class Solution {
 
 
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         subsetsWithDup(new int[] {1, 2, 2, 3});
     }
 }
