@@ -4,57 +4,33 @@ package com.likou.everyday;
 
 
 public class Solution {
+
     /**
-     * 将直方图分为3部分
-     * 1.从左端点到最高端点
-     * 2.从第一个最高端点到最后一个最高端点
-     * 3.从右端点到最后一个最高端点
+     * 动态规划
+     * 注意dp的行列
+     * dp[i][j]代表text1[0...i]和text2[0...j]的最长公共子序列
+     * 当text1[i-1]==text2[j-1]时, text[i][j] = text[i-1][j-1]+1
+     * 当text1[i-1]!=text2[j-1]时, text[i][j] = max(text[i][j-1],text[i-1][j])
      */
-    public static int trap(int[] height) {
-        int n = height.length;
-        if (n < 3) {
-            return 0;
-        }
-        int result = 0;
-        int max = height[0];
-        int left = 0, right = 0;
-        for (int i = 0; i < n; i++) {
-            if (height[i] > max) {
-                max = height[i];
-                left = i;
-                right = i;
-            } else if (height[i] == max) {
-                right = i;
+    public static int longestCommonSubsequence(String text1, String text2) {
+        int length1 = text1.length();
+        int length2 = text2.length();
+        int [][]dp = new int[length1+1][length2+1];
+        for (int i = 1; i <= length1; i++) {
+            char ch = text1.charAt(i-1);
+            for (int j = 1; j <= length2; j++) {
+                if (text2.charAt(j-1) == ch) {
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i][j-1], dp[i-1][j]);
+                }
             }
         }
-        //用于记录一个水槽的开始边界
-        int start = 0;
-        //从左端点到最高端点
-        for (int i = 1; i < left; i++) {
-            if (height[i] < height[start]) {
-                result += height[start] - height[i];
-            } else {
-                start = i;
-            }
-        }
-        //从第一个最高端点到最后一个最高端点
-        for (int i = left + 1; i < right; i++) {
-            result += height[left] - height[i];
-        }
-        start = n - 1;
-        //从右端点到最后一个最高端点
-        for (int i = n - 2; i > right; i--) {
-            if (height[i] < height[start]) {
-                result += height[start] - height[i];
-            } else {
-                start = i;
-            }
-        }
-        return result;
+        return dp[length1][length2];
     }
 
     public static void main(String[] args) {
-        System.out.println(trap(new int[]{4,2,0,3,2,5}));
+        longestCommonSubsequence("abcde", "ace");
     }
 }
 
