@@ -1,73 +1,60 @@
 package com.likou.everyday;
 
 
-import java.util.*;
-
 
 
 public class Solution {
     /**
-     * 采用地板除法
-     * N * (N-1) / (N-2) = N + 1;
-     * N * (N-1) / (N-2) + (N-3) - (N-4) * (N-5) / (N-6)
-     * (N-3) == (N-4) * (N-5) / (N-6), 后面没四项都为0
+     * 将直方图分为3部分
+     * 1.从左端点到最高端点
+     * 2.从第一个最高端点到最后一个最高端点
+     * 3.从右端点到最后一个最高端点
      */
-    public static int clumsy(int N) {
-        if (N == 1) {
-            return 1;
-        } else if (N == 2) {
-            return 2;
-        } else if (N == 3) {
-            return 6;
-        } else if (N == 4) {
-            return 7;
+    public static int trap(int[] height) {
+        int n = height.length;
+        if (n < 3) {
+            return 0;
         }
-
-        if (N % 4 == 0) {
-            return N + 1;
-        } else if (N % 4 <= 2) {
-            return N + 2;
-        } else {
-            return N - 1;
-        }
-    }
-
-    /**
-     * 遍历每一个数字, 使用flag作为判断运算符标志
-     */
-    public static int clumsy1(int N) {
         int result = 0;
-        int flag = 0;
-        int temp = 1;
-        for (int i = N; i > 0; i--) {
-            switch (flag++ % 4) {
-                case 0:
-                case 1:
-                    temp *= i;
-                    break;
-                case 2:
-                    temp /= i;
-                    result += temp;
-                    temp = -1;
-                    break;
-                case 3:
-                    result += i;
-                    break;
-                default:
-                    break;
+        int max = height[0];
+        int left = 0, right = 0;
+        for (int i = 0; i < n; i++) {
+            if (height[i] > max) {
+                max = height[i];
+                left = i;
+                right = i;
+            } else if (height[i] == max) {
+                right = i;
             }
         }
-        //当flag等于1或者2时说明result还没有进行相加就退出循环了,因此需要加回来
-        if (flag % 4 < 3 && flag % 4 > 0) {
-            result += temp;
+        //用于记录一个水槽的开始边界
+        int start = 0;
+        //从左端点到最高端点
+        for (int i = 1; i < left; i++) {
+            if (height[i] < height[start]) {
+                result += height[start] - height[i];
+            } else {
+                start = i;
+            }
+        }
+        //从第一个最高端点到最后一个最高端点
+        for (int i = left + 1; i < right; i++) {
+            result += height[left] - height[i];
+        }
+        start = n - 1;
+        //从右端点到最后一个最高端点
+        for (int i = n - 2; i > right; i--) {
+            if (height[i] < height[start]) {
+                result += height[start] - height[i];
+            } else {
+                start = i;
+            }
         }
         return result;
     }
 
-
-
     public static void main(String[] args) {
-        System.out.println(clumsy(4));
+        System.out.println(trap(new int[]{4,2,0,3,2,5}));
     }
 }
 
