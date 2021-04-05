@@ -5,6 +5,10 @@ import java.util.Arrays;
 
 public class Solution {
 
+    /**
+     * 第一钟使用了判断原数组中是否存在三个以上的相同数字思想
+     * 第二种使用了判断更改数组中是否已经存在了两个相同数字思想
+     */
     public static int removeDuplicates(int[] nums) {
         int slow = 0, fast = 0;
         int n = nums.length;
