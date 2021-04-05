@@ -1,40 +1,41 @@
 package com.likou.everyday;
 
 
+import java.util.Arrays;
 
 public class Solution {
 
     /**
-     * 分析可得同一种颜色兔子说的数字n最多只能有n+1次
-     * 当超过n+1时要考虑作为另外一种兔子,因此同一个数字最多有
-     * (Math.ceil((double)frequency[i] / (i + 1)) * (i + 1))
+     * 两数组从后往前排序即可, 不需要额外的空间
      */
-    public static int numRabbits(int[] answers) {
-        int length = answers.length;
-        if (length == 0) {
-            return 0;
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        if (n == 0) {
+            return;
         }
-        int result = 0;
-        int[] frequency = new int[1000];
-        for (int answer : answers) {
-            frequency[answer]++;
-        }
-        for (int i = 0; i < 1000; i++) {
-            if (frequency[i] > 0) {
-//                if (frequency[i] >= i + 1) {
-//                    result += (frequency[i] / (i + 1) * (i + 1));
-//                }
-//                if (frequency[i] % (i + 1) != 0) {
-//                    result += i + 1;
-//                }
-                result += Math.ceil((double)frequency[i] / (i + 1)) * (i + 1);
+//        if (m == 0) {
+//            nums1 = nums2;
+//        }
+        int index = nums1.length - 1, index1 = m - 1, index2 = n - 1;
+        while (index1 >= 0 || index2 >= 0) {
+            if (index1 >= 0 && index2 >= 0) {
+                if (nums1[index1] > nums2[index2]) {
+                    nums1[index--] = nums1[index1--];
+                } else {
+                    nums1[index--] = nums2[index2--];
+                }
+            } else if (index1 >=0) {
+                nums1[index--] = nums1[index1--];
+            } else {
+                nums1[index--] = nums2[index2--];
             }
         }
-        return result;
     }
 
     public static void main(String[] args) {
-        numRabbits(new int[]{0,0,1,1,1});
+        int []nums1 = new int[]{0};
+        int []nums2 = new int[]{1};
+        merge(nums1, 0, nums2, 1);
+        System.out.println(Arrays.toString(nums1));
     }
 }
 
