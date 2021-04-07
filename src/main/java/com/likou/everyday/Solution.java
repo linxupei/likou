@@ -1,7 +1,8 @@
 package com.likou.everyday;
 
 
-
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class Solution {
     /**
@@ -53,8 +54,82 @@ public class Solution {
         return result;
     }
 
+    /**
+     * 使用动态规划的方法, 找出从左/右两个开始的当前下标最大值
+     * 再取他们的两个的最小值即可
+     */
+    public static int trap_1(int[] height) {
+        int length = height.length;
+        if (length == 0) {
+            return 0;
+        }
+        int []left = new int[length];
+        int []right = new int[length];
+        int result = 0;
+        left[0] = height[0];
+        for (int i = 1; i < length; i++) {
+            left[i] = Math.max(left[i-1], height[i]);
+        }
+        right[length - 1] = height[length - 1];
+        for (int i = length - 2; i >= 0; i--) {
+            right[i] = Math.max(right[i + 1], height[i]);
+        }
+        for (int i = 0; i < length; i++) {
+            result += Math.min(left[i], right[i]) - height[i];
+        }
+        return result;
+    }
+
+    /**
+     * 使用下标单调递增栈统计
+     */
+    public static int trap_2(int[] height) {
+        int result = 0;
+        int length = height.length;
+        Deque<Integer> stack = new LinkedList<>();
+        for (int i = 0; i < length; i++) {
+            //当当前下标的位置比栈中元素高时,说明可能存在接水的位置
+            while (!stack.isEmpty() && height[i] > height[stack.peek()]) {
+                int top = stack.pop();
+                if (stack.isEmpty()) {
+                    break;
+                }
+                int left = stack.peek();
+                int currWidth = i - left - 1;
+                int currHeight = Math.min(height[left], height[i]) - height[top];
+                result += currWidth * currHeight;
+            }
+            stack.push(i);
+        }
+        return result;
+    }
+
+    /**
+     * 双指针+左/右统计当前下标最大值
+     * 当左/右指针还未相遇时
+     * 若height[left] < height[right], 说明leftMax < rightMax(由该算法遍历过程决定), 则result += leftMax - height[left]
+     * 若height[left] >= height[right], 说明leftMax > rightMax(由该算法遍历过程决定), 则result += rightMax - height[right]
+     */
+    public static int trap_3(int[] height) {
+        int result = 0;
+        int leftMax = 0, rightMax = 0;
+        int left = 0, right = height.length - 1;
+        while (left < right) {
+            if (height[left] < height[right]) {
+                leftMax = Math.max(leftMax, height[left]);
+                result += leftMax - height[left];
+                left++;
+            } else {
+                rightMax = Math.max(rightMax, height[right]);
+                result += rightMax - height[right];
+                right--;
+            }
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
-        System.out.println(trap(new int[]{4,2,0,3,2,5}));
+        System.out.println(trap_3(new int[]{0,1,0,2,1,0,1,3,2,1,2,1}));
     }
 }
 
