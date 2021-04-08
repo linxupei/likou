@@ -5,36 +5,44 @@ import java.util.Arrays;
 
 public class Solution {
 
-    public static boolean search(int[] nums, int target) {
+    public static int findMin_1(int[] nums) {
         int low = 0, height = nums.length - 1;
-        while (low <= height) {
+        while (low < height) {
+            //最小值在该范围, 且范围内数字是递增
+            if (nums[low] <= nums[height]) {
+                return nums[low];
+            }
             int mid = low + ((height - low) >> 1);
-            if (nums[mid] == target) {
-                return true;
-            } else if (nums[low] == nums[mid] && nums[mid] == nums[height]) {
-                //遇到类似情况[1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1], 2
-                low++;
-                height--;
-            } else if (nums[low] <= nums[mid]) {
-                if (target >= nums[low] && target <= nums[mid]) {
-                    height = mid - 1;
-                } else {
-                    low = mid + 1;
-                }
+            //最小值在该范围, 且范围内数字是递减
+            if (nums[low] >= nums[mid] && nums[mid] >= nums[height]) {
+                return nums[height];
+            }
+            if (nums[mid] < nums[height]) {
+                height = mid;
             } else {
-                if (target >= nums[mid] && target <= nums[height]) {
-                    low = mid + 1;
-                } else {
-                    height = mid - 1;
-                }
+                low = mid;
             }
         }
-        return false;
+        return nums[low];
+    }
+
+    public static int findMin(int[] nums) {
+        int low = 0, height = nums.length - 1;
+        while (low < height) {
+            int mid = low + ((height - low) >> 1);
+            if (nums[mid] < nums[height]) {
+                //不减1, 避免排除最小值
+                height = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return nums[low];
     }
 
 
     public static void main(String[] args) {
-        System.out.println(search(new int[]{1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1}, 2));
+        System.out.println(findMin(new int[]{3,1,2}));
     }
 }
 
