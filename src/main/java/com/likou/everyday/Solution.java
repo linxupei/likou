@@ -2,31 +2,30 @@ package com.likou.everyday;
 
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
 
 public class Solution {
 
-
-    public static int findMin(int[] nums) {
-        int low = 0, height = nums.length - 1;
-        while (low < height) {
-            int mid = low + ((height - low) >> 1);
-            if (nums[mid] == nums[low] && nums[mid] == nums[height]) {
-                //三个位置都相等时无法判断是否还有更小值, 先把左右两个相等的去掉
-                low++;
-                height--;
-            } else if (nums[mid] <= nums[height]) {
-                //不减1, 避免排除最小值
-                height = mid;
-            } else {
-                low = mid + 1;
+    /**
+     * 丑数: n = 2^(a) * 3^(b) * 5^(c)
+     */
+    public static boolean isUgly(int n) {
+        if (n <= 0) {
+            return false;
+        }
+        int m = n;
+        int []factors = new int[]{2,3,5};
+        for (int factor : factors) {
+            while (m % factor == 0) {
+                m /= factor;
             }
         }
-        return nums[low];
+        return m == 1;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(findMin(new int[]{2,2,2,2,2,2,2,2,2,2,2,1,2,2}));
+        System.out.println(isUgly(25));
     }
 }
 
