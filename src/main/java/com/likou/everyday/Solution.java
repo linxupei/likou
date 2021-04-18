@@ -4,33 +4,41 @@ package com.likou.everyday;
 import java.util.*;
 
 public class Solution {
-
-    public static int removeDuplicates(int[] nums) {
-        int slow = 0, fast = 0;
-        int n = nums.length;
-        if (n <= 1) {
-            return n;
-        }
-        while (fast < n) {
-            nums[slow++] = nums[fast++];
-            while (fast >= 1 && fast < n && nums[fast] == nums[fast-1]) {
-                fast++;
+    /**
+     * 使用快慢指针即可
+     */
+    public static int removeElement(int[] nums, int val) {
+        int length = nums.length;
+        int index = 0;
+        for (int i = 0; i < length; i++) {
+            if (nums[i] != val) {
+                nums[index++] = nums[i];
             }
         }
-        // slow = 1;
-        // fast = 1;
-        // while (fast < n) {
-        //     if (nums[slow - 1] != nums[fast]) {
-        //         nums[slow] = nums[fast];
-        //         slow++;
-        //     }
-        //     fast++;
-        // }
-        return slow;
+        return index;
+    }
+
+    /**
+     * 当遇到非目标值, 把结点放入新链表, 并与原链表断开即可
+     */
+    public ListNode removeElements(ListNode head, int val) {
+        ListNode newHead = new ListNode(0);
+        ListNode temp = newHead;
+        ListNode pre = null;
+        while (head != null) {
+            pre = head;
+            if (head.val != val) {
+                temp.next = head;
+                temp = temp.next;
+            }
+            head = head.next;
+            pre.next = null;
+        }
+        return newHead.next;
     }
 
     public static void main(String[] args) {
-        removeDuplicates(new int[]{1,5,9,9});
+        removeElement(new int[]{1,5,9,9}, 1);
     }
 }
 
