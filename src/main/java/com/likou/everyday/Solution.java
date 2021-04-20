@@ -4,41 +4,43 @@ package com.likou.everyday;
 import java.util.*;
 
 public class Solution {
-    /**
-     * 使用快慢指针即可
-     */
-    public static int removeElement(int[] nums, int val) {
-        int length = nums.length;
+    public static int strStr(String haystack, String needle) {
+        if (needle == null ||needle.equals("")) {
+            return 0;
+        }
+        int hayLength = haystack.length();
+        int neeLength = needle.length();
+        if (neeLength > hayLength) {
+            return -1;
+        }
+        char[] hay = haystack.toCharArray();
+        char[] nee = needle.toCharArray();
+        //用于记录遍历needle的下标, 当index == neeLength - 1
+        //即可确认haystack中存在子串needle
         int index = 0;
-        for (int i = 0; i < length; i++) {
-            if (nums[i] != val) {
-                nums[index++] = nums[i];
+        int pre = -1;
+        for (int i = 0; i + neeLength < hayLength; i++) {
+            if (hay[i] == nee[0] && index != 0 && pre == -1) {
+                pre = i;
+            }
+            if (hay[i] == nee[index]) {
+                index++;
+                if (index == neeLength) {
+                    return i - neeLength + 1;
+                }
+            } else {
+                if (index != 0 && pre != -1) {
+                    i = pre - 1;
+                    pre = -1;
+                }
+                index = 0;
             }
         }
-        return index;
-    }
-
-    /**
-     * 当遇到非目标值, 把结点放入新链表, 并与原链表断开即可
-     */
-    public ListNode removeElements(ListNode head, int val) {
-        ListNode newHead = new ListNode(0);
-        ListNode temp = newHead;
-        ListNode pre = null;
-        while (head != null) {
-            pre = head;
-            if (head.val != val) {
-                temp.next = head;
-                temp = temp.next;
-            }
-            head = head.next;
-            pre.next = null;
-        }
-        return newHead.next;
+        return -1;
     }
 
     public static void main(String[] args) {
-        removeElement(new int[]{1,5,9,9}, 1);
+        System.out.println(strStr("mississippi", "pi"));
     }
 }
 
