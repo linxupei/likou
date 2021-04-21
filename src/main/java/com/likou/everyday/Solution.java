@@ -4,43 +4,37 @@ package com.likou.everyday;
 import java.util.*;
 
 public class Solution {
-    public static int strStr(String haystack, String needle) {
-        if (needle == null ||needle.equals("")) {
+    /**
+     * 设dp[i]表示字符串 s 的前 i 个字符 s[1..i] 的解码方法数
+     * 第一种情况: 对s[i]进行单个字符解码, 只要s[i] != 0, 则dp[i] = dp[i-1]
+     * 第二种情况: 对s[i-1],s[i]两个字符进行解码, 需要s[i-1] != 0 && s[i-1,i]组合小于'26', 则dp[i] = dp[i-2]
+     */
+    public static int numDecodings(String s) {
+        int length = s.length();
+        char[] chars = s.toCharArray();
+        //第一个字符为'0', 无法解码
+        if (chars[0] == '0') {
             return 0;
         }
-        int hayLength = haystack.length();
-        int neeLength = needle.length();
-        if (neeLength > hayLength) {
-            return -1;
-        }
-        char[] hay = haystack.toCharArray();
-        char[] nee = needle.toCharArray();
-        //用于记录遍历needle的下标, 当index == neeLength - 1
-        //即可确认haystack中存在子串needle
-        int index = 0;
-        int pre = -1;
-        for (int i = 0; i + neeLength < hayLength; i++) {
-            if (hay[i] == nee[0] && index != 0 && pre == -1) {
-                pre = i;
+        int[] dp = new int[length + 1];
+        dp[0] = 1;
+        for (int i = 1; i <= length; i++) {
+            //当连续出现两个字符'0'或者连续出现的两个字符大于'20', 说明无法解码
+            if (i > 1 &&chars[i - 1] == '0' && (chars[i - 2] == '0' || chars[i - 2] >= '3')) {
+                return 0;
             }
-            if (hay[i] == nee[index]) {
-                index++;
-                if (index == neeLength) {
-                    return i - neeLength + 1;
-                }
-            } else {
-                if (index != 0 && pre != -1) {
-                    i = pre - 1;
-                    pre = -1;
-                }
-                index = 0;
+            if (chars[i - 1] != '0') {
+                dp[i] += dp[i - 1];
+            }
+            if (i > 1 && chars[i - 2] != '0' && ((chars[i-2] - '0') * 10 + chars[i-1] - '0' <= 26)) {
+                dp[i] += dp[i - 2];
             }
         }
-        return -1;
+        return dp[length];
     }
 
     public static void main(String[] args) {
-        System.out.println(strStr("mississippi", "pi"));
+        System.out.println(numDecodings("2611055971756562"));
     }
 }
 
