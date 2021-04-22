@@ -5,36 +5,43 @@ import java.util.*;
 
 public class Solution {
     /**
-     * 设dp[i]表示字符串 s 的前 i 个字符 s[1..i] 的解码方法数
-     * 第一种情况: 对s[i]进行单个字符解码, 只要s[i] != 0, 则dp[i] = dp[i-1]
-     * 第二种情况: 对s[i-1],s[i]两个字符进行解码, 需要s[i-1] != 0 && s[i-1,i]组合小于'26', 则dp[i] = dp[i-2]
+     * 枚举上下边界, 计算每一列的和, 将二维数据转换一维数组
+     * [A1, A2, A3,... Arows]表示在某上下边界内, 每一列的和组成的数组
+     * Sj - Si <= k, 即该区间满足要求, 可转为Sj - k <= Si
      */
-    public static int numDecodings(String s) {
-        int length = s.length();
-        char[] chars = s.toCharArray();
-        //第一个字符为'0', 无法解码
-        if (chars[0] == '0') {
-            return 0;
+    public static int maxSumSubmatrix(int[][] matrix, int k) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int ret = Integer.MIN_VALUE;
+        //枚举上边界
+        for (int i = 0; i < rows; i++) {
+            int[] sum = new int[cols];
+            //枚举下边界
+            for (int j = i; j < rows; j++) {
+                for (int l = 0; l < cols; l++) {
+                    sum[l] += matrix[j][l];
+                }
+                int count = 0;
+                TreeSet<Integer> treeSet = new TreeSet<>();
+                treeSet.add(0);
+                for (int s : sum) {
+                    count += s;
+                    Integer ceil = treeSet.ceiling(count - k);
+                    if (ceil != null) {
+                        ret = Math.max(ret, count - ceil);
+                        if (ret == k) {
+                            return ret;
+                        }
+                    }
+                    treeSet.add(count);
+                }
+            }
         }
-        int[] dp = new int[length + 1];
-        dp[0] = 1;
-        for (int i = 1; i <= length; i++) {
-            //当连续出现两个字符'0'或者连续出现的两个字符大于'20', 说明无法解码
-            if (i > 1 &&chars[i - 1] == '0' && (chars[i - 2] == '0' || chars[i - 2] >= '3')) {
-                return 0;
-            }
-            if (chars[i - 1] != '0') {
-                dp[i] += dp[i - 1];
-            }
-            if (i > 1 && chars[i - 2] != '0' && ((chars[i-2] - '0') * 10 + chars[i-1] - '0' <= 26)) {
-                dp[i] += dp[i - 2];
-            }
-        }
-        return dp[length];
+        return ret;
     }
 
     public static void main(String[] args) {
-        System.out.println(numDecodings("2611055971756562"));
+        System.out.println(maxSumSubmatrix(new int[][]{{2,2,-1}}, 0));
     }
 }
 
