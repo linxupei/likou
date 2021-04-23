@@ -4,44 +4,51 @@ package com.likou.everyday;
 import java.util.*;
 
 public class Solution {
+
     /**
-     * Ã¶¾ÙÉÏÏÂ±ß½ç, ¼ÆËãÃ¿Ò»ÁĞµÄºÍ, ½«¶şÎ¬Êı¾İ×ª»»Ò»Î¬Êı×é
-     * [A1, A2, A3,... Arows]±íÊ¾ÔÚÄ³ÉÏÏÂ±ß½çÄÚ, Ã¿Ò»ÁĞµÄºÍ×é³ÉµÄÊı×é
-     * Sj - Si <= k, ¼´¸ÃÇø¼äÂú×ãÒªÇó, ¿É×ªÎªSj - k <= Si
+     * æ’åº+åŠ¨æ€è§„åˆ’+è´ªå¿ƒ
+     * dp[i][0]è¡¨ç¤ºèƒ½nums[i]æ•´é™¤çš„æ•°å­—æœ‰å‡ ä¸ª,
+     * dp[i][1]è¡¨ç¤ºnums[0..i]ä¸­èƒ½è¢«nums[i]æ•´é™¤çš„æœ€å¤§å€¼çš„ä¸‹æ ‡ä¸º
      */
-    public static int maxSumSubmatrix(int[][] matrix, int k) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int ret = Integer.MIN_VALUE;
-        //Ã¶¾ÙÉÏ±ß½ç
-        for (int i = 0; i < rows; i++) {
-            int[] sum = new int[cols];
-            //Ã¶¾ÙÏÂ±ß½ç
-            for (int j = i; j < rows; j++) {
-                for (int l = 0; l < cols; l++) {
-                    sum[l] += matrix[j][l];
-                }
-                int count = 0;
-                TreeSet<Integer> treeSet = new TreeSet<>();
-                treeSet.add(0);
-                for (int s : sum) {
-                    count += s;
-                    Integer ceil = treeSet.ceiling(count - k);
-                    if (ceil != null) {
-                        ret = Math.max(ret, count - ceil);
-                        if (ret == k) {
-                            return ret;
-                        }
+    public static List<Integer> largestDivisibleSubset(int[] nums) {
+        int length = nums.length;
+        List<Integer> ret = new ArrayList<Integer>();
+        Arrays.sort(nums);
+        int [][]dp = new int[length][2];
+        dp[0][0] = 1;
+        dp[0][1] = -1;
+        //è®°å½•æ•´é™¤å­é›†æœ€å¤šå…ƒç´ çš„å€¼, ä»¥åŠç›¸åº”ä¸‹æ ‡
+        int[] max = new int[2];
+        for (int i = 0; i < length; i++) {
+            boolean flag = false;
+            for (int j = i - 1; j >= 0; j--) {
+                //å¯¹äºä¸€ä¸ªæ•°å¯èƒ½ä¼šæœ‰å¤šæ¡åˆ†æ”¯, å¦‚: 18(åˆ†æ”¯ä¸€: 1,2,9,18) 18(åˆ†æ”¯äºŒ: 1,3,9,18)
+                if (nums[i] % nums[j] == 0 && dp[j][0] + 1 > dp[i][0]) {
+                    dp[i][0] = dp[j][0] + 1;
+                    dp[i][1] = j;
+                    flag = true;
+                    if (dp[i][0] > max[0]) {
+                        max[0] = dp[i][0];
+                        max[1] = i;
                     }
-                    treeSet.add(count);
                 }
             }
+            //nums[i]æ— æ³•è¢«num[0..i)ä¸­ä»»ä½•ä¸€ä¸ªæ•°æ•´é™¤
+            if (!flag) {
+                dp[i][0] = 1;
+                dp[i][1] = -1;
+            }
+        }
+        //å°†ç›¸åº”çš„æ•´é™¤é“¾è¾“å‡ºå³å¯
+        while (max[1] != -1) {
+            ret.add(nums[max[1]]);
+            max[1] = dp[max[1]][1];
         }
         return ret;
     }
 
     public static void main(String[] args) {
-        System.out.println(maxSumSubmatrix(new int[][]{{2,2,-1}}, 0));
+        System.out.println(largestDivisibleSubset(new int[]{1,2,4,8}));
     }
 }
 
