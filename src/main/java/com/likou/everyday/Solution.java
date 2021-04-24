@@ -6,50 +6,67 @@ import java.util.*;
 public class Solution {
 
     /**
-     * 排序+动态规划+贪心
-     * dp[i][0]表示能nums[i]整除的数字有几个,
-     * dp[i][1]表示nums[0..i]中能被nums[i]整除的最大值的下标为
+     * dp[i]表示nums中选取元素能组成i的组合个数有多少
+     * dp[0] = 1, 组成0的只有1钟方式, 表示不选取任何元素
+     * dp[i] += dp[i - num], 表示任何一个num(num <= i), 都能加入(i - num)的组合中
+     * 使得(i - num) + num = i, 成为新的组合
      */
-    public static List<Integer> largestDivisibleSubset(int[] nums) {
-        int length = nums.length;
-        List<Integer> ret = new ArrayList<Integer>();
-        Arrays.sort(nums);
-        int [][]dp = new int[length][2];
-        dp[0][0] = 1;
-        dp[0][1] = -1;
-        //记录整除子集最多元素的值, 以及相应下标
-        int[] max = new int[2];
-        for (int i = 0; i < length; i++) {
-            boolean flag = false;
-            for (int j = i - 1; j >= 0; j--) {
-                //对于一个数可能会有多条分支, 如: 18(分支一: 1,2,9,18) 18(分支二: 1,3,9,18)
-                if (nums[i] % nums[j] == 0 && dp[j][0] + 1 > dp[i][0]) {
-                    dp[i][0] = dp[j][0] + 1;
-                    dp[i][1] = j;
-                    flag = true;
-                    if (dp[i][0] > max[0]) {
-                        max[0] = dp[i][0];
-                        max[1] = i;
-                    }
+    public static int combinationSum4(int[] nums, int target) {
+        int[] dp = new int[target + 1];
+        dp[0] = 1;
+        for (int i = 1; i <= target; i++) {
+            for (int num : nums) {
+                if (i >= num) {
+                    dp[i] += dp[i - num];
                 }
             }
-            //nums[i]无法被num[0..i)中任何一个数整除
-            if (!flag) {
-                dp[i][0] = 1;
-                dp[i][1] = -1;
+        }
+        return dp[target];
+    }
+
+    //超出内存限制
+    public static int findSum4(int[] nums, int target) {
+        Deque<Integer> queue = new ArrayDeque<>();
+        queue.add(target);
+        int count = 0;
+        while (!queue.isEmpty()) {
+            Integer pop = queue.pop();
+            for (int i = 0; i < nums.length; i++) {
+                int temp = pop - nums[i];
+                if (temp <= 0) {
+                    if (temp == 0) {
+                        count += 1;
+                    }
+                } else {
+                    queue.add(temp);
+                }
             }
         }
-        //将相应的整除链输出即可
-        while (max[1] != -1) {
-            ret.add(nums[max[1]]);
-            max[1] = dp[max[1]][1];
+        return count;
+    }
+
+    /**
+     * 递归找出所有组合, 超时
+     */
+    public static int findSum(int[] nums, int target) {
+        //因为只有正数, 当总和超过target, 无法完成
+        if (target < 0) {
+            return 0;
         }
-        return ret;
+        //刚好达成目标返回即可
+        if (target == 0) {
+            return 1;
+        }
+        int count = 0;
+        for (int i = 0; i < nums.length; i++) {
+            count += findSum(nums, target - nums[i]);
+        }
+        return count;
     }
 
 
     public static void main(String[] args) {
-        System.out.println(largestDivisibleSubset(new int[]{1,2,4,8}));
+        System.out.println(combinationSum4(new int[]{2,1,3},35));
     }
 }
 
