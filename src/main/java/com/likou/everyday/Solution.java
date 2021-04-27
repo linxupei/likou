@@ -1,54 +1,76 @@
 package com.likou.everyday;
 
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class Solution {
 
-    /**
-     * 使用二分查找法, 判断某个船容量需要多少天
-     * 船容量最小值为货物之中最大值, 船容量最大值为全部货物总和
-     */
-    public static int shipWithinDays(int[] weights, int D) {
-        int left = 0, right = 0;
-        for (int weight : weights) {
-            right += weight;
-            left = Math.max(left, weight);
+    public int rangeSumBST(TreeNode root, int low, int high) {
+//        List<Integer> arr = new ArrayList<>();
+//        getNodes(arr, root);
+//        int lowIndex = binarySearch(arr, low);
+//        int heightIndex = binarySearch(arr, high);
+//        int ret = 0;
+//        for (int i = lowIndex; i <= heightIndex; i++) {
+//            ret += arr.get(i);
+//        }
+//        return ret;
+        return getSum(root, low, high);
+    }
+
+
+    public int getSum(TreeNode root, int low, int height) {
+        if (root == null) {
+            return 0;
         }
-//        left = Arrays.stream(weights).max().getAsInt();
-//        right = Arrays.stream(weights).sum();
-        while (left < right) {
-            int mid = left +  ((right - left) >> 1);
-            int possible = possible(weights, mid);
-            if (possible > D) {
-                left = mid + 1;
+        //当root.val比height还大, 只能到左子树查找, 右子树的每个结点比root.val都大
+        if (root.val > height) {
+            return getSum(root.left, low, height);
+        }
+        //当root.val比low还小, 只能到右子树查找, 左子树的每个结点比root.val都小
+        if (root.val < low) {
+            return getSum(root.right, low, height);
+        }
+        return root.val + getSum(root.left, low, height) + getSum(root.right, low, height);
+    }
+
+    //中序遍历
+    public void getNodes(List<Integer> arr, TreeNode root) {
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        TreeNode p = root;
+        while (p != null || !stack.isEmpty()) {
+            while (p != null) {
+                stack.push(p);
+                p = p.left;
+            }
+            if (!stack.isEmpty()) {
+                p = stack.pop();
+                arr.add(p.val);
+                p = p.right;
+            }
+        }
+    }
+
+    //二分查找法
+    public int binarySearch(List<Integer> arr, Integer target) {
+        //在arr[l...h]中查找
+        int l = 0, h = arr.size() - 1;
+        while (l <= h) {
+            int mid = l + ((h - l) >> 1);
+            if (arr.get(mid).compareTo(target) == 0) {
+                return mid;
+            }
+            if (arr.get(mid).compareTo(target) > 0) {
+                h = mid - 1;
             } else {
-                right = mid;
+                l = mid + 1;
             }
         }
-        return left;
+        return -1;
     }
-
-    /**
-     * 判断对于某个船容量, 需要在几天内运完
-     */
-    public static int possible(int[] weights, int capacity) {
-        int days = 0;
-        int count = 0;
-        for (int weight : weights) {
-            count += weight;
-            if (count > capacity) {
-                days++;
-                count = weight;
-            }
-        }
-        return ++days;
-    }
-
 
     public static void main(String[] args) {
-        System.out.println(shipWithinDays(new int[]{3,2,2,4,1,4}, 3));
-        System.out.println(shipWithinDays(new int[]{1,2,3,4,5,6,7,8,9,10}, 5));
     }
 }
 
