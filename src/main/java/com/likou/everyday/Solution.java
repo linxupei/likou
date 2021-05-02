@@ -5,34 +5,25 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class Solution {
-
     /**
-     * 将每一个员工信息保存在哈希表中, 以便快速查询
-     * 通过深度优先遍历计算相应的员工链重要度总和
+     * 穿过最少的砖块数即穿过最多的缝隙数
+     * 统计每一块砖右边界到墙的左边界的距离
+     * 找出最多的那一个缝隙
      */
-    public int getImportance(List<Employee> employees, int id) {
-        int size = employees.size();
-        HashMap<Integer, Employee> hashMap = new HashMap<>(size);
-        for (Employee employee : employees) {
-            hashMap.put(employee.id, employee);
+    public int leastBricks(List<List<Integer>> wall) {
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+        for (List<Integer> list : wall) {
+            int dis = 0;
+            for (int i = 0; i < list.size() - 1; i++) {
+                dis  += list.get(i);
+                hashMap.put(dis, hashMap.getOrDefault(dis, 0) + 1);
+            }
         }
-        return getImportance(hashMap, id);
-    }
-
-    /**
-     * 深度优先遍历
-     */
-    public int getImportance(HashMap<Integer, Employee> hashMap, int id) {
-        Employee employee = hashMap.get(id);
-        //基本问题, 当没有相应员工时, 返回重要度0
-        if (employee == null) {
-            return 0;
+        int max = 0;
+        for (Map.Entry<Integer, Integer> entry : hashMap.entrySet()) {
+            max = Math.max(max, entry.getValue());
         }
-        int ret = employee.importance;
-        for (int subordinate : employee.subordinates) {
-            ret += getImportance(hashMap, subordinate);
-        }
-        return ret;
+        return wall.size() - max;
     }
 
     public static void main(String[] args) {
