@@ -5,25 +5,21 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class Solution {
-    /**
-     * 穿过最少的砖块数即穿过最多的缝隙数
-     * 统计每一块砖右边界到墙的左边界的距离
-     * 找出最多的那一个缝隙
-     */
-    public int leastBricks(List<List<Integer>> wall) {
-        HashMap<Integer, Integer> hashMap = new HashMap<>();
-        for (List<Integer> list : wall) {
-            int dis = 0;
-            for (int i = 0; i < list.size() - 1; i++) {
-                dis  += list.get(i);
-                hashMap.put(dis, hashMap.getOrDefault(dis, 0) + 1);
+    public int reverse(int x) {
+        int res = 0;
+        while (x != 0) {
+            int pop = x % 10;
+            x = x / 10;
+            //注意边界条件
+            if (res > Integer.MAX_VALUE / 10 || (res == Integer.MAX_VALUE / 10 && pop > 7)) {
+                return 0;
             }
+            if (res < Integer.MIN_VALUE / 10 || (res == Integer.MIN_VALUE / 10 && pop < -8)) {
+                return 0;
+            }
+            res = res * 10 + pop;
         }
-        int max = 0;
-        for (Map.Entry<Integer, Integer> entry : hashMap.entrySet()) {
-            max = Math.max(max, entry.getValue());
-        }
-        return wall.size() - max;
+        return res;
     }
 
     public static void main(String[] args) {
