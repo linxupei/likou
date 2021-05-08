@@ -20,7 +20,7 @@ public class Solution {
      * @param jobs 每一份工作消耗的时间
      * @param index 当前的工作下标
      * @param max 当前工人中最大时长
-     * @param used 对 max >= ans,
+     * @param used 对 max >= ans 的增强优化, 当前没有工作的下标
      */
     public void dfs(int[] em, int[] jobs, int index, int max, int used) {
         if (max >= ans) {
